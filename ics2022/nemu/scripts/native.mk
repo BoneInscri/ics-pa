@@ -41,10 +41,19 @@ gdb: run-env
 	$(call git_commit, "gdb NEMU")
 	gdb -s $(BINARY) --args $(NEMU_EXEC)
 
+COUNT_C := $(shell  find . -name "*.c" | xargs grep -v "^$$" | wc -l)  
+COUNT_H := $(shell  find . -name "*.h" | xargs grep -v "^$$" | wc -l)  
+
+count_c:
+	@echo $(COUNT_C)
+
+count_h:
+	@echo $(COUNT_H)
+
 clean-tools = $(dir $(shell find ./tools -maxdepth 2 -mindepth 2 -name "Makefile"))
 $(clean-tools):
 	-@$(MAKE) -s -C $@ clean
 clean-tools: $(clean-tools)
 clean-all: clean distclean clean-tools
 
-.PHONY: run gdb run-env clean-tools clean-all $(clean-tools)
+.PHONY: run gdb count_c count_h run-env clean-tools clean-all $(clean-tools)
