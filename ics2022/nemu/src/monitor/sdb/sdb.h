@@ -19,5 +19,23 @@
 #include <common.h>
 
 word_t expr(char *e, bool *success);
+uint32_t eval(int start, int end);
+
+#define NR_WP 64
+#define cmd_arg_max 50
+// 双向链表(非循环），用数组改造
+typedef struct watchpoint
+{
+  int NO;
+  struct watchpoint *next;
+  struct watchpoint *prev;
+  word_t exp_val;
+  char watch_name[cmd_arg_max];
+  /* TODO: Add more members if necessary */
+} WP;
+WP *new_wp(char* exp, word_t exp_val);
+int delete_wp(int NO);
+void show_wp();
+int trace_watchpoint();
 
 #endif

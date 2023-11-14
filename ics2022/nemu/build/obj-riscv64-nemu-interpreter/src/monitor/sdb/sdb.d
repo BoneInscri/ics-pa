@@ -17,6 +17,8 @@ deps_/media/boneinscri/Expand_1/HDU/南大PA/ics2022_git/ics-pa/ics2022/nemu/bui
     $(wildcard include/config/target/native/elf.h) \
   /media/boneinscri/Expand_1/HDU/南大PA/ics2022_git/ics-pa/ics2022/nemu/include/cpu/cpu.h \
   src/monitor/sdb/sdb.h \
+  /media/boneinscri/Expand_1/HDU/南大PA/ics2022_git/ics-pa/ics2022/nemu/include/memory/paddr.h \
+    $(wildcard include/config/pc/reset/offset.h) \
 
 /media/boneinscri/Expand_1/HDU/南大PA/ics2022_git/ics-pa/ics2022/nemu/build/obj-riscv64-nemu-interpreter/src/monitor/sdb/sdb.o: $(deps_/media/boneinscri/Expand_1/HDU/南大PA/ics2022_git/ics-pa/ics2022/nemu/build/obj-riscv64-nemu-interpreter/src/monitor/sdb/sdb.o)
 
