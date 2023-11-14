@@ -32,19 +32,36 @@ static bool g_print_step = false;
 
 void device_update();
 
+extern int trace_watchpoint();
+
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
   if (ITRACE_COND) { log_write("%s\n", _this->logbuf); }
 #endif
   if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(_this->logbuf)); }
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
+
+#ifdef CONFIG_CC_WATCHPOINT
+  int ret = trace_watchpoint();
+  if(ret) {
+    nemu_state.state = NEMU_STOP;  
+  }
+#endif
+
 }
 
+//  取指, 译码, 执行, 更新PC
 static void exec_once(Decode *s, vaddr_t pc) {
+  // printf("=============== pc : %lx ==============\n", cpu.pc);
   s->pc = pc;
+  // 当前指令的地址
   s->snpc = pc;
+  // 下一条指令的地址 static next PC
   isa_exec_once(s);
   cpu.pc = s->dnpc;
+  // printf("hhh : cpu.pc : %lx, dnpc : %lx\n", cpu.pc, s->dnpc);
+  // 更新pc为 下一条指令的地址
+  // dynamic next PC
 #ifdef CONFIG_ITRACE
   char *p = s->logbuf;
   p += snprintf(p, sizeof(s->logbuf), FMT_WORD ":", s->pc);
@@ -76,8 +93,13 @@ static void execute(uint64_t n) {
   for (;n > 0; n --) {
     exec_once(&s, cpu.pc);
     g_nr_guest_inst ++;
+    // 执行的指令数量+1
     trace_and_difftest(&s, cpu.pc);
-    if (nemu_state.state != NEMU_RUNNING) break;
+    if (nemu_state.state != NEMU_RUNNING) {
+      // NEMU表示这个模拟的计算机，只有在RUNNING的状态下才能继续执行指令！
+      break; 
+    }
+    // printf("%d\n", nemu_state.state);
     IFDEF(CONFIG_DEVICE, device_update());
   }
 }
@@ -100,7 +122,8 @@ void assert_fail_msg() {
 void cpu_exec(uint64_t n) {
   g_print_step = (n < MAX_INST_TO_PRINT);
   switch (nemu_state.state) {
-    case NEMU_END: case NEMU_ABORT:
+    case NEMU_END: 
+    case NEMU_ABORT:
       printf("Program execution has ended. To restart the program, exit NEMU and run again.\n");
       return;
     default: nemu_state.state = NEMU_RUNNING;
@@ -114,9 +137,11 @@ void cpu_exec(uint64_t n) {
   g_timer += timer_end - timer_start;
 
   switch (nemu_state.state) {
-    case NEMU_RUNNING: nemu_state.state = NEMU_STOP; break;
-
-    case NEMU_END: case NEMU_ABORT:
+    case NEMU_RUNNING: 
+      nemu_state.state = NEMU_STOP; 
+      break;
+    case NEMU_END: 
+    case NEMU_ABORT:
       Log("nemu: %s at pc = " FMT_WORD,
           (nemu_state.state == NEMU_ABORT ? ANSI_FMT("ABORT", ANSI_FG_RED) :
            (nemu_state.halt_ret == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) :

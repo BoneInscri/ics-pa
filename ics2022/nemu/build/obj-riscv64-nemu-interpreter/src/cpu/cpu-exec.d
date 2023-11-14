@@ -6,6 +6,7 @@ deps_/media/boneinscri/Expand_1/HDU/南大PA/ics2022_git/ics-pa/ics2022/nemu/bui
     $(wildcard include/config/itrace/cond.h) \
     $(wildcard include/config/itrace.h) \
     $(wildcard include/config/difftest.h) \
+    $(wildcard include/config/cc/watchpoint.h) \
     $(wildcard include/config/isa/x86.h) \
     $(wildcard include/config/isa/loongarch32r.h) \
     $(wildcard include/config/device.h) \
