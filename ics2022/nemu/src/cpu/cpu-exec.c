@@ -34,23 +34,6 @@ void device_update();
 
 extern int trace_watchpoint();
 
-static void trace_and_difftest(Decode *_this, vaddr_t dnpc)
-{
-#ifdef CONFIG_ITRACE_COND
-  // if (ITRACE_COND) { log_write("%s\n", _this->logbuf); }
-#endif
-  // if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(_this->logbuf)); }
-  IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
-
-  // #ifdef CONFIG_CC_WATCHPOINT
-  int ret = trace_watchpoint();
-  if (ret)
-  {
-    nemu_state.state = NEMU_STOP;
-  }
-  // #endif
-}
-
 #ifdef CONFIG_ITRACE
 char logbuf[ITRACE_SIZE][128];
 int itrace_p;
@@ -85,6 +68,25 @@ __attribute__((used)) static void recordItrace(Decode *s)
   itrace_p = itrace_p % ITRACE_SIZE;
 }
 #endif
+
+static void trace_and_difftest(Decode *_this, vaddr_t dnpc)
+{
+// #ifdef CONFIG_ITRACE_COND
+//   // if (ITRACE_COND) { log_write("%s\n", _this->logbuf); }
+// #endif
+  if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(logbuf[itrace_p])); }
+  IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
+
+  // #ifdef CONFIG_CC_WATCHPOINT
+  int ret = trace_watchpoint();
+  if (ret)
+  {
+    nemu_state.state = NEMU_STOP;
+  }
+  // #endif
+}
+
+
 
 //  取指, 译码, 执行, 更新PC
 static void exec_once(Decode *s, vaddr_t pc)
