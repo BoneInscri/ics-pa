@@ -52,8 +52,6 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc)
 }
 
 #ifdef CONFIG_ITRACE
-#define ITRACE_SIZE 30
-// 环形缓冲区的大小为30
 char logbuf[ITRACE_SIZE][128];
 int itrace_p;
 

@@ -245,6 +245,19 @@ fail:
   return 0;
 }
 
+#ifdef CONFIG_ITRACE
+extern char logbuf[ITRACE_SIZE][128];
+extern int itrace_p;
+
+static int cmd_itrace(char *args)
+{
+  for(int i = 0;i<ITRACE_SIZE;i++) {
+    log_write("%s\n", logbuf[i]);
+  } 
+  return 0;
+}
+#endif
+
 static struct
 {
   const char *name;
@@ -259,7 +272,8 @@ static struct
     {"x", "Memory scan", cmd_x},
     {"p", "Caculate value of expression", cmd_p},
     {"w", "Set Watchpoints", cmd_w},
-    {"d", "Delete Watchpoints", cmd_d}
+    {"d", "Delete Watchpoints", cmd_d}, 
+    {"itrace", "Print the instructions ring buffer", cmd_itrace}
     /* TODO: Add more commands */
 };
 
