@@ -20,6 +20,7 @@
 #define ITRACE_SIZE 30
 
 void cpu_exec(uint64_t n);
+void itrace_print();
 
 void set_nemu_state(int state, vaddr_t pc, int halt_ret);
 void invalid_inst(vaddr_t thispc);

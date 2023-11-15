@@ -145,6 +145,19 @@ void assert_fail_msg()
   statistic();
 }
 
+void itrace_print() {
+  for(int i = 0;i<ITRACE_SIZE;i++) {
+    if(logbuf[i]) {
+      if(i!=itrace_p) {
+        log_write("      ");
+      } else  {
+        log_write("  --> ");
+      }
+      log_write("%s\n", logbuf[i]);
+    }
+  }
+}
+
 /* Simulate how the CPU works. */
 void cpu_exec(uint64_t n)
 {
@@ -173,6 +186,7 @@ void cpu_exec(uint64_t n)
     break;
   case NEMU_END:
   case NEMU_ABORT:
+    itrace_print();
     Log("nemu: %s at pc = " FMT_WORD,
         (nemu_state.state == NEMU_ABORT ? ANSI_FMT("ABORT", ANSI_FG_RED) : (nemu_state.halt_ret == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) : ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
         nemu_state.halt_pc);
