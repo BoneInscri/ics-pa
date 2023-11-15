@@ -49,6 +49,14 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 // #endif
 }
 
+
+#define ITRACE_SIZE 30
+// 环形缓冲区的大小为30
+#ifdef CONFIG_ITRACE
+char logbuf[ITRACE_SIZE][128];
+int itrace_p;
+#endif
+
 //  取指, 译码, 执行, 更新PC
 static void exec_once(Decode *s, vaddr_t pc) {
   // printf("=============== pc : %lx ==============\n", cpu.pc);
