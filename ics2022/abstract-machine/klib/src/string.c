@@ -32,28 +32,18 @@ char *strcat(char *dst, const char *src)
 
 int strcmp(const char *s1, const char *s2)
 {
-  size_t s1_len = strlen(s1);
-  size_t s2_len = strlen(s2);
-  if (s1_len < s2_len)
-    return -1;
-  else if (s1_len > s2_len)
-    return 1;
-  int s1_idx = 0;
-  int s2_idx = 0;
-  while (s1[s1_idx] && s2[s2_idx])
-  {
-    if (*s1 < *s2)
-    {
-      return -1;
-    }
-    else if (*s1 > *s2)
-    {
-      return 1;
-    }
-    s1_idx++;
-    s2_idx++;
+  while(*s1 && *s2 && *s1 == *s2) {
+    s1++;
+    s2++;
   }
-  return 0;
+  int ret = *s1-*s2;
+  if(ret == 0) {
+    return 0;
+  } else if(ret > 0) {
+    return 1;
+  } else {
+    return -1;
+  }
   // panic("Not implemented");
 }
 
