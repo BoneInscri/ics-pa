@@ -47,7 +47,7 @@ int sprintf(char *out, const char *fmt, ...)
   va_list ap;
   int d;
   // char c;
-  char *s;
+  // char *s;
   int s_len = 0;
   int out_idx = 0;
   char buf[20];
@@ -60,12 +60,12 @@ int sprintf(char *out, const char *fmt, ...)
       fmt++;
       switch (*fmt)
       {
-      case 's': /* string */
-        s = va_arg(ap, char *);
-        s_len = strlen(s);
-        strcpy(out + out_idx, s);
-        out_idx += s_len;
-        break;
+      // case 's': /* string */
+      //   s = va_arg(ap, char *);
+      //   s_len = strlen(s);
+      //   strcpy(out + out_idx, s);
+      //   out_idx += s_len;
+      //   break;
       case 'd': /* int */
         d = va_arg(ap, int);
         s_len = int2str(d, buf);
