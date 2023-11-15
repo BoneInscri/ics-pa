@@ -13,11 +13,12 @@ size_t strlen(const char *s)
 
 char *strcpy(char *dst, const char *src)
 {
-  while(*src) {
-    *dst = *src;
-    src++;
+  int dst_p = 0;
+  int src_p = 0;
+  while(src[src_p]) {
+    dst[dst_p++] = src[src_p++];
   }
-  *dst = '\0';
+  dst[dst_p] = '\0';
   return dst;
 }
 
@@ -28,13 +29,14 @@ char *strncpy(char *dst, const char *src, size_t n)
 
 char *strcat(char *dst, const char *src)
 {
-  while(*dst) dst++;
-  while(*src) {
-    *dst = *src;
-    dst++;
-    src++;
+  int dst_p = 0;
+  int src_p = 0;
+
+  while(dst[dst_p]) dst_p++;
+  while(src[src_p]) {
+    dst[dst_p++] = src[src_p++];
   }
-  *dst = '\0';
+  dst[dst_p] = '\0';
   return dst;
 }
 
