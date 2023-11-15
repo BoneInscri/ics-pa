@@ -75,7 +75,7 @@ void *memset(void *s, int c, size_t n)
 {
   for (int i = 0; i < n; i++)
   {
-    *((int *)s + i) = c;
+    *((uint8_t *)s + i) = c;
   }
   return s;
 }
