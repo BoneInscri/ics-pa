@@ -159,11 +159,11 @@ void itrace_print()
     {
       if (i != itrace_p)
       {
-        log_write("      ");
+        log_write("    ");
       }
       else
       {
-        log_write("  --> ");
+        log_write("--> ");
       }
       log_write("%s\n", logbuf[i]);
     }
