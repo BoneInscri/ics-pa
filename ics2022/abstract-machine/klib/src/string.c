@@ -38,7 +38,9 @@ int strcmp(const char *s1, const char *s2)
     return -1;
   else if (s1_len > s2_len)
     return 1;
-  while (s1 && s2)
+  int s1_idx = 0;
+  int s2_idx = 0;
+  while (s1[s1_idx] && s2[s2_idx])
   {
     if (*s1 < *s2)
     {
@@ -48,6 +50,8 @@ int strcmp(const char *s1, const char *s2)
     {
       return 1;
     }
+    s1_idx++;
+    s2_idx++;
   }
   return 0;
   // panic("Not implemented");
