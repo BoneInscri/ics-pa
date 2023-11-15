@@ -21,10 +21,6 @@
 word_t expr(char *e, bool *success);
 uint32_t eval(int start, int end);
 
-
-#define ITRACE_SIZE 30
-// itrace 环形缓冲区大小
-
 #define NR_WP 64
 #define cmd_arg_max 50
 // 双向链表(非循环），用数组改造

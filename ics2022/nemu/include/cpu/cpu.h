@@ -17,7 +17,7 @@
 #define __CPU_CPU_H__
 
 #include <common.h>
-#define ITRACE_SIZE 30
+#define ITRACE_SIZE 10
 
 void cpu_exec(uint64_t n);
 void itrace_print();
