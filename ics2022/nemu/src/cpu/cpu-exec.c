@@ -65,7 +65,9 @@ __attribute__((used)) static void recordItrace(Decode *s)
   p[0] = '\0'; // the upstream llvm does not support loongarch32r
 #endif
   itrace_p++;
-  itrace_p = itrace_p % ITRACE_SIZE;
+  if(itrace_p == ITRACE_SIZE) {
+    itrace_p = 0;
+  }
 }
 #endif
 
