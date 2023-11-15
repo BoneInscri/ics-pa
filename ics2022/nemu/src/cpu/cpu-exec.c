@@ -36,9 +36,9 @@ extern int trace_watchpoint();
 
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
-  if (ITRACE_COND) { log_write("%s\n", _this->logbuf); }
+  // if (ITRACE_COND) { log_write("%s\n", _this->logbuf); }
 #endif
-  if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(_this->logbuf)); }
+  // if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(_this->logbuf)); }
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 
 // #ifdef CONFIG_CC_WATCHPOINT
@@ -62,34 +62,36 @@ static void exec_once(Decode *s, vaddr_t pc) {
   // 更新pc为 下一条指令的地址
   // dynamic next PC
 #ifdef CONFIG_ITRACE
-  char *p = s->logbuf;
-  p += snprintf(p, sizeof(s->logbuf), FMT_WORD ":", s->pc);
-  int ilen = s->snpc - s->pc;
-  int i;
-  uint8_t *inst = (uint8_t *)&s->isa.inst.val;
-  for (i = ilen - 1; i >= 0; i --) {
-    p += snprintf(p, 4, " %02x", inst[i]);
-  }
-  int ilen_max = MUXDEF(CONFIG_ISA_x86, 8, 4);
-  int space_len = ilen_max - ilen;
-  if (space_len < 0) space_len = 0;
-  space_len = space_len * 3 + 1;
-  memset(p, ' ', space_len);
-  p += space_len;
+//   char *p = s->logbuf;
+//   p += snprintf(p, sizeof(s->logbuf), FMT_WORD ":", s->pc);
+//   int ilen = s->snpc - s->pc;
+//   int i;
+//   uint8_t *inst = (uint8_t *)&s->isa.inst.val;
+//   for (i = ilen - 1; i >= 0; i --) {
+//     p += snprintf(p, 4, " %02x", inst[i]);
+//   }
+//   int ilen_max = MUXDEF(CONFIG_ISA_x86, 8, 4);
+//   int space_len = ilen_max - ilen;
+//   if (space_len < 0) space_len = 0;
+//   space_len = space_len * 3 + 1;
+//   memset(p, ' ', space_len);
+//   p += space_len;
 
-#ifndef CONFIG_ISA_loongarch32r
-  void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
-  disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
-      MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst.val, ilen);
-#else
-  p[0] = '\0'; // the upstream llvm does not support loongarch32r
-#endif
+// #ifndef CONFIG_ISA_loongarch32r
+//   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
+//   disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
+//       MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst.val, ilen);
+// #else
+//   p[0] = '\0'; // the upstream llvm does not support loongarch32r
+// #endif
 
 #endif
 }
 
 static void execute(uint64_t n) {
   Decode s;
+
+  IFDEF(CONFIG_ITRACE, itrace_p = 0);
   for (;n > 0; n --) {
     exec_once(&s, cpu.pc);
     g_nr_guest_inst ++;
