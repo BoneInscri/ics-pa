@@ -252,7 +252,14 @@ extern int itrace_p;
 static int cmd_itrace(char *args)
 {
   for(int i = 0;i<ITRACE_SIZE;i++) {
-    log_write("%s\n", logbuf[i]);
+    if(logbuf[i]) {
+      if(i!=itrace_p) {
+        log_write("      ");
+      } else  {
+        log_write("  --> ");
+      }
+      log_write("%s\n", logbuf[i]);
+    }
   } 
   return 0;
 }
