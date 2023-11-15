@@ -20,8 +20,8 @@
 
 #define ITRACE_SIZE 30
 // 环形缓冲区的大小为30
-// IFDEF(CONFIG_ITRACE, char logbuf[ITRACE_SIZE][128]);
-// IFDEF(CONFIG_ITRACE, int itrace_p);
+IFDEF(CONFIG_ITRACE, char logbuf[ITRACE_SIZE][128]);
+IFDEF(CONFIG_ITRACE, int itrace_p);
 
 typedef struct Decode {
   vaddr_t pc;
