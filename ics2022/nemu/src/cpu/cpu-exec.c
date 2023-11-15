@@ -64,19 +64,27 @@ __attribute__((used)) static void recordItrace(Decode *s)
 #else
   p[0] = '\0'; // the upstream llvm does not support loongarch32r
 #endif
-  itrace_p++;
-  if(itrace_p == ITRACE_SIZE) {
-    itrace_p = 0;
-  }
+
 }
 #endif
 
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc)
 {
-// #ifdef CONFIG_ITRACE_COND
-//   // if (ITRACE_COND) { log_write("%s\n", _this->logbuf); }
-// #endif
-  if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(logbuf[itrace_p-1])); }
+#ifdef CONFIG_ITRACE
+  recordItrace(_this);
+
+  if (g_print_step)
+  {
+    puts(logbuf[itrace_p]);
+  }
+  itrace_p++;
+  if (itrace_p == ITRACE_SIZE)
+  {
+    itrace_p = 0;
+  }
+
+#endif
+
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 
   // #ifdef CONFIG_CC_WATCHPOINT
@@ -87,8 +95,6 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc)
   }
   // #endif
 }
-
-
 
 //  取指, 译码, 执行, 更新PC
 static void exec_once(Decode *s, vaddr_t pc)
@@ -103,9 +109,6 @@ static void exec_once(Decode *s, vaddr_t pc)
   // printf("hhh : cpu.pc : %lx, dnpc : %lx\n", cpu.pc, s->dnpc);
   // 更新pc为 下一条指令的地址
   // dynamic next PC
-#ifdef CONFIG_ITRACE
-  recordItrace(s);
-#endif
 }
 
 static void execute(uint64_t n)
@@ -119,6 +122,7 @@ static void execute(uint64_t n)
     g_nr_guest_inst++;
     // 执行的指令数量+1
     trace_and_difftest(&s, cpu.pc);
+
     if (nemu_state.state != NEMU_RUNNING)
     {
       // NEMU表示这个模拟的计算机，只有在RUNNING的状态下才能继续执行指令！
@@ -147,12 +151,18 @@ void assert_fail_msg()
   statistic();
 }
 
-void itrace_print() {
-  for(int i = 0;i<ITRACE_SIZE;i++) {
-    if(logbuf[i]) {
-      if(i!=itrace_p) {
+void itrace_print()
+{
+  for (int i = 0; i < ITRACE_SIZE; i++)
+  {
+    if (logbuf[i])
+    {
+      if (i != itrace_p)
+      {
         log_write("      ");
-      } else  {
+      }
+      else
+      {
         log_write("  --> ");
       }
       log_write("%s\n", logbuf[i]);
