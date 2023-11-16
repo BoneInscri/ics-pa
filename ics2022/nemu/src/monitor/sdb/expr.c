@@ -21,7 +21,8 @@
 #include <regex.h>
 
 #include <stdint.h>
-#include <memory/paddr.h>
+// #include <memory/paddr.h>
+#include <memory/vaddr.h>
 
 enum
 {
@@ -347,7 +348,7 @@ word_t eval(int start, int end)
     switch (tokens[start].type)
     {
     case TK_DEREF:
-      return paddr_read(num_tmp, sizeof(num_tmp));
+      return vaddr_read(num_tmp, sizeof(num_tmp));
     case TK_NEG:
       // printf("start : %d, end : %d, TK_NEG\n", start, end);
       return -num_tmp;
@@ -401,7 +402,7 @@ word_t eval(int start, int end)
     case '/':
       return val1 / val2;
     case TK_DEREF:
-      return paddr_read(val2, sizeof(val2));
+      return vaddr_read(val2, sizeof(val2));
     case TK_NEG:
       return -val2;
     case TK_EQ:

@@ -18,6 +18,9 @@
 
 #include <common.h>
 
+#define Mtrace_start 0x80000000
+#define Mtrace_end   0x87000000
+
 #define PMEM_LEFT  ((paddr_t)CONFIG_MBASE)
 #define PMEM_RIGHT ((paddr_t)CONFIG_MBASE + CONFIG_MSIZE - 1)
 #define RESET_VECTOR (PMEM_LEFT + CONFIG_PC_RESET_OFFSET)

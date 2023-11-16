@@ -18,7 +18,8 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "sdb.h"
-#include "memory/paddr.h"
+// #include "memory/paddr.h"
+#include <memory/vaddr.h>
 
 static int is_batch_mode = false;
 
@@ -184,7 +185,7 @@ static int cmd_x(char *args)
     {
       printf("0x%x:", addr_p + EXPR);
     }
-    word_t read_data = paddr_read(EXPR + i, 1);
+    word_t read_data = vaddr_read(EXPR + i, 1);
     printf(" %02lx", read_data);
     addr_p++;
     if (addr_p % 16 == 0)
