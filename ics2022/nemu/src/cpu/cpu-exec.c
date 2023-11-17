@@ -153,6 +153,7 @@ void assert_fail_msg()
 
 void itrace_print()
 {
+#ifdef CONFIG_ITRACE
   for (int i = 0; i < ITRACE_SIZE; i++)
   {
     if (logbuf[i])
@@ -168,6 +169,7 @@ void itrace_print()
       log_write("%s\n", logbuf[i]);
     }
   }
+#endif
 }
 
 /* Simulate how the CPU works. */

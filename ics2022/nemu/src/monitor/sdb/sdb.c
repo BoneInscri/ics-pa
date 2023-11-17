@@ -272,7 +272,9 @@ static struct
     {"p", "Caculate value of expression", cmd_p},
     {"w", "Set Watchpoints", cmd_w},
     {"d", "Delete Watchpoints", cmd_d}, 
+#ifdef CONFIG_ITRACE
     {"itrace", "Print the instructions ring buffer", cmd_itrace}
+#endif
     /* TODO: Add more commands */
 };
 
