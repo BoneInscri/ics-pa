@@ -47,6 +47,8 @@ CFLAGS_BUILD += $(if $(CONFIG_CC_DEBUG),-Og -ggdb3,)
 CFLAGS_BUILD += $(if $(CONFIG_CC_ASAN),-fsanitize=address,)
 CFLAGS_BUILD += $(if $(CONFIG_TARGET_AM), -D__CONFIG_TARGE_AM,)
 
+CFLAGS_BUILD += -DRUN_DIRECTLY_COND=$(if $(CONFIG_RUN_DIRECTLY_COND),$(call remove_quote,$(CONFIG_RUN_DIRECTLY_COND)),true)
+
 CFLAGS_TRACE += -DITRACE_COND=$(if $(CONFIG_ITRACE_COND),$(call remove_quote,$(CONFIG_ITRACE_COND)),true)
 CFLAGS_TRACE += -DMTRACE_COND=$(if $(CONFIG_MTRACE_COND),$(call remove_quote,$(CONFIG_MTRACE_COND)),true)
 

@@ -19,8 +19,10 @@ void sdb_mainloop();
 
 void engine_start() {
 #ifdef CONFIG_TARGET_AM
+// #ifdef CONFIG_RUN_DIRECTLY_COND
   cpu_exec(-1);
 #else
+  // cpu_exec(-1);
   /* Receive commands from user. */
   sdb_mainloop();
 #endif

@@ -6,6 +6,7 @@
 
 size_t strlen(const char *s)
 {
+  assert(s);
   size_t len = 0;
   while (s[len])
     len++;
@@ -14,19 +15,48 @@ size_t strlen(const char *s)
 
 char *strcpy(char *dst, const char *src)
 {
-  int dst_p = 0;
-  int src_p = 0;
-  while (src[src_p])
+  assert(dst);
+  assert(src);
+  int src_len = strlen(src);
+  if (src >= dst && src < dst + src_len)
   {
-    dst[dst_p++] = src[src_p++];
+    int last_idx = src_len - 1;
+    for (int i = last_idx; i >= 0; i--)
+    {
+      dst[i] = src[i];
+    }
+    dst[src_len] = '\0';
   }
-  dst[dst_p] = '\0';
+  else
+  {
+    int dst_p = 0;
+    int src_p = 0;
+    while (src[src_p])
+    {
+      dst[dst_p++] = src[src_p++];
+    }
+    dst[dst_p] = '\0';
+  }
   return dst;
 }
 
 char *strncpy(char *dst, const char *src, size_t n)
 {
-  panic("Not implemented");
+  assert(dst);
+  assert(src);
+  size_t i;
+  for (i = 0; i < n && src[i] != '\0'; i++)
+  {
+    dst[i] = src[i];
+  }
+  // 不会主动添加\0
+  while (i < n)
+  {
+    dst[i] = '\0';
+    i++;
+  }
+  // 使用\0进行补全
+  return dst;
 }
 
 char *strcat(char *dst, const char *src)
@@ -104,6 +134,5 @@ int memcmp(const void *s1, const void *s2, size_t n)
     }
   }
   return 0;
-  // panic("Not implemented");
 }
 #endif

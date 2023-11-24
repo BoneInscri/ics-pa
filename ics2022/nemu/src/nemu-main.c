@@ -29,6 +29,14 @@ int main(int argc, char *argv[]) {
   init_monitor(argc, argv);
 #endif
 
+// #ifdef CONFIG_RUN_DIRECTLY_COND
+
+//   am_init_monitor();
+// #else
+//   init_monitor(argc, argv);
+// #endif
+
+
   /* Start engine. */
   engine_start();
 

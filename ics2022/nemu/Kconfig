@@ -120,6 +120,17 @@ config CC_ASAN
   depends on MODE_SYSTEM
   bool "Enable address sanitizer"
   default n
+
+# config RUN_DIRECTLY
+#   bool "Enable jump over sdb"
+#   default y
+
+# config RUN_DIRECTLY_COND
+#   depends on RUN_DIRECTLY
+#   string "jump over sdb"
+#   default "true"
+
+
 endmenu
 
 menu "Testing and Debugging"
