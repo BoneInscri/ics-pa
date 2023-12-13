@@ -2,8 +2,15 @@
 
 void (*entry)() = NULL; // mp entry
 
+__attribute__((noinline))
+void check(bool cond) {
+  if (!cond) halt(1);
+}
+
 static const char *tests[256] = {
     ['1'] = "strlen_test",
+    ['2'] = "strcmp_test",
+    // ['2'] = "strcpy_test"
 };
 
 int main(const char *args)
@@ -11,6 +18,8 @@ int main(const char *args)
   switch (args[0])
   {
     CASE('1', strlen_test);
+    CASE('2', strcmp_test);
+    // CASE('2', strcpy_test);
   default:
     // printf("Usage: make run mainargs=*\n");
     for (int ch = 0; ch < 256; ch++)

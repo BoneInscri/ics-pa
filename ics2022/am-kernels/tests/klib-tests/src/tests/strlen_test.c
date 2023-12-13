@@ -1,8 +1,7 @@
 #include <klibtest.h>
-#include "trap.h"
 
-char *str_list[] = {"abcdefg", "hhhhhiijlafjal", "hello world", "\n\nhello", "00000"};
-int ans[] = {7, 14, 11, 7, 5};
+char *str_list[] = {"abcdefg", "hhhhhiijlafjal", "hello world", "\n\nhello", "00000", "1303340"};
+int ans[] = {7, 14, 11, 7, 5, 7};
 
 #define NR_DATA LENGTH(str_list)
 

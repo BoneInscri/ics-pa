@@ -21,8 +21,6 @@ extern void (*entry)();
     break; \
   }
 
-
-
-
+void check(bool cond);
 
 #endif

@@ -622,3 +622,25 @@ Sets the default goal to be used if no targets were specified on the command lin
 
 
 
+
+
+
+
+
+
+42. **make -ns**
+
+逆推Makefile
+
+
+
+43. **abspath**
+
+```shell
+$(abspath names...)
+```
+
+For each file name in names return an **absolute** **name** that does not contain any . or .. components, **nor any repeated path separators (/)**. Note that, in contrast to realpath function, abspath does not resolve symlinks and does not require the file names to refer to an existing file or directory. 
+
+
+

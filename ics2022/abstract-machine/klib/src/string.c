@@ -8,9 +8,69 @@ size_t strlen(const char *s)
 {
   assert(s);
   size_t len = 0;
-  while (s[len])
+  while (s[len] != '\0')
     len++;
   return len;
+}
+
+int strcmp(const char *s1, const char *s2)
+{
+  assert(s1);
+  assert(s2);
+  while (*s1 && *s2 && *s1 == *s2)
+  {
+    s1++;
+    s2++;
+  }
+  int ret = *s1 - *s2;
+  if (ret == 0)
+  {
+    return 0;
+  }
+  else if (ret > 0)
+  {
+    return 1;
+  }
+  else
+  {
+    return -1;
+  }
+}
+
+int strncmp(const char *s1, const char *s2, size_t n)
+{
+  assert(s1);
+  assert(s2);
+  if(!n) {
+    return 0;
+  }
+
+  while (n > 0 && *s1 != '\0' && *s2 != '\0' && *s1 == *s2)
+  {
+    s1++;
+    s2++;
+    n--;
+  }
+
+  int ret = 0;
+  if(!n)  {
+    ret = *(s1-1)-*(s2-1);
+  } else {
+    ret = *s1 - *s2;
+  }
+
+  if (ret == 0)
+  {
+    return 0;
+  }
+  else if (ret > 0)
+  {
+    return 1;
+  }
+  else
+  {
+    return -1;
+  }
 }
 
 char *strcpy(char *dst, const char *src)
@@ -18,7 +78,7 @@ char *strcpy(char *dst, const char *src)
   assert(dst);
   assert(src);
   int src_len = strlen(src);
-  if (src >= dst && src < dst + src_len)
+  if (dst >= src && dst < src + src_len)
   {
     int last_idx = src_len - 1;
     for (int i = last_idx; i >= 0; i--)
@@ -61,6 +121,8 @@ char *strncpy(char *dst, const char *src, size_t n)
 
 char *strcat(char *dst, const char *src)
 {
+  assert(dst);
+  assert(src);
   int dst_p = 0;
   int src_p = 0;
 
@@ -72,33 +134,6 @@ char *strcat(char *dst, const char *src)
   }
   dst[dst_p] = '\0';
   return dst;
-}
-
-int strcmp(const char *s1, const char *s2)
-{
-  while (*s1 && *s2 && *s1 == *s2)
-  {
-    s1++;
-    s2++;
-  }
-  int ret = *s1 - *s2;
-  if (ret == 0)
-  {
-    return 0;
-  }
-  else if (ret > 0)
-  {
-    return 1;
-  }
-  else
-  {
-    return -1;
-  }
-}
-
-int strncmp(const char *s1, const char *s2, size_t n)
-{
-  panic("Not implemented");
 }
 
 void *memset(void *s, int c, size_t n)

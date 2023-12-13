@@ -2004,13 +2004,90 @@ make html
 
 
 
-106. **abspath**
 
-```shell
-$(abspath names...)
+
+106. 如果想用本机的glibc，那么就需要将 /abstract-machine/klib/include/klib.h中的  
+
+```c
+#define __NATIVE_USE_KLIB__
 ```
 
-For each file name in names return an **absolute** **name** that does not contain any . or .. components, **nor any repeated path separators (/)**. Note that, in contrast to realpath function, abspath does not resolve symlinks and does not require the file names to refer to an existing file or directory. 
+注释掉！
+
+
+
+
+
+107. strlen 需要注意的点：
+
+```c
+#include <string.h>
+size_t strlen(const char *s);
+```
+
+The strlen() function calculates the length of the string pointed to by s, excluding the terminating null byte ('\0').
+
+
+
+
+
+108. strcpy 需要注意的点：
+
+```c
+char *strcpy(char *dest, const char *src);
+char *strncpy(char *dest, const char *src, size_t n);
+```
+
+The  **strcpy**()  function  copies the string pointed to by src, including the terminating null byte ('\0'), to the buffer pointed to by dest.  The strings may not **overlap**, and the destination string dest must be large enough to receive the copy.
+
+If the length of src is less than n, strncpy() **writes additional null bytes to dest** to ensure that **a total of n bytes are written**.
+
+<img src="PA_2.assets/image-20231213163246240.png" alt="image-20231213163246240" style="zoom:67%;" />
+
+
+
+
+
+109. klib 测试指令
+
+```shell
+make ARCH=riscv64-nemu run mainargs=1
+```
+
+
+
+110. 如果需要传递main参数，需要用mainargs=
+
+```shell
+make ARCH=riscv64-nemu mainargs=hello run
+```
+
+
+
+111. strcmp 函数需要注意的点
+
+```c
+int strcmp(const char *s1, const char *s2);
+int strncmp(const char *s1, const char *s2, size_t n);
+```
+
+The strcmp()  function  compares the two strings s1 and s2.
+
+The strncmp() function is similar, **except it compares only the first (at most) n bytes of s1 and s2.**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
