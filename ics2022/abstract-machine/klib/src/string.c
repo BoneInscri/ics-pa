@@ -23,18 +23,9 @@ int strcmp(const char *s1, const char *s2)
     s2++;
   }
   int ret = *s1 - *s2;
-  if (ret == 0)
-  {
-    return 0;
-  }
-  else if (ret > 0)
-  {
-    return 1;
-  }
-  else
-  {
-    return -1;
-  }
+  if (ret == 0) return 0;
+  else if (ret > 0) return 1;
+  else return -1;
 }
 
 int strncmp(const char *s1, const char *s2, size_t n)
@@ -59,18 +50,9 @@ int strncmp(const char *s1, const char *s2, size_t n)
     ret = *s1 - *s2;
   }
 
-  if (ret == 0)
-  {
-    return 0;
-  }
-  else if (ret > 0)
-  {
-    return 1;
-  }
-  else
-  {
-    return -1;
-  }
+  if (ret == 0) return 0;
+  else if (ret > 0) return 1;
+  else return -1;
 }
 
 char *strcpy(char *dst, const char *src)

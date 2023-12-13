@@ -11,4 +11,9 @@ void strlen_test()
     {
         check(strlen(str_list[i]) == ans[i]);
     }
+
+    // from glibc
+    check(strlen("") == 0);     /* Empty. */
+    check(strlen("a") == 1);    /* Single char. */
+    check(strlen("abcd") == 4); /* Multiple chars. */
 }

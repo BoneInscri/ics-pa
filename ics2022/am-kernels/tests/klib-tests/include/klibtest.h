@@ -22,5 +22,8 @@ extern void (*entry)();
   }
 
 void check(bool cond);
+void str_equal(char* a, char* b);
+
+#define	STREQ(a, b)	(strcmp((a), (b)) == 0)
 
 #endif
