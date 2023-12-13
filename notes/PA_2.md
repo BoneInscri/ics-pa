@@ -1992,3 +1992,27 @@ memcpy 和 memset 使用特别多，可以进行算法上的优化。
 
 
 
+105. **在abstract-machine 下执行**
+
+```shell
+make html
+```
+
+可以得到一个html版本的Makfile!
+
+（发现一个彩蛋）
+
+
+
+106. **abspath**
+
+```shell
+$(abspath names...)
+```
+
+For each file name in names return an **absolute** **name** that does not contain any . or .. components, **nor any repeated path separators (/)**. Note that, in contrast to realpath function, abspath does not resolve symlinks and does not require the file names to refer to an existing file or directory. 
+
+
+
+
+
