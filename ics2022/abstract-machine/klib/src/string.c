@@ -23,16 +23,20 @@ int strcmp(const char *s1, const char *s2)
     s2++;
   }
   int ret = *s1 - *s2;
-  if (ret == 0) return 0;
-  else if (ret > 0) return 1;
-  else return -1;
+  if (ret == 0)
+    return 0;
+  else if (ret > 0)
+    return 1;
+  else
+    return -1;
 }
 
 int strncmp(const char *s1, const char *s2, size_t n)
 {
   assert(s1);
   assert(s2);
-  if(!n) {
+  if (!n)
+  {
     return 0;
   }
 
@@ -44,15 +48,21 @@ int strncmp(const char *s1, const char *s2, size_t n)
   }
 
   int ret = 0;
-  if(!n)  {
-    ret = *(s1-1)-*(s2-1);
-  } else {
+  if (!n)
+  {
+    ret = *(s1 - 1) - *(s2 - 1);
+  }
+  else
+  {
     ret = *s1 - *s2;
   }
 
-  if (ret == 0) return 0;
-  else if (ret > 0) return 1;
-  else return -1;
+  if (ret == 0)
+    return 0;
+  else if (ret > 0)
+    return 1;
+  else
+    return -1;
 }
 
 char *strcpy(char *dst, const char *src)
@@ -86,16 +96,39 @@ char *strncpy(char *dst, const char *src, size_t n)
 {
   assert(dst);
   assert(src);
-  size_t i;
-  for (i = 0; i < n && src[i] != '\0'; i++)
+
+  // pay attention to overlap
+  int src_len = strlen(src);
+  src_len = (n < src_len ? n : src_len);// restrict it!
+
+  if (dst >= src && dst < src + src_len)
   {
-    dst[i] = src[i];
+    int last_idx = src_len - 1;
+    for (int i = last_idx; i >= 0; i--)
+    {
+      dst[i] = src[i];
+    }
+    dst[src_len] = '\0';
   }
-  // 不会主动添加\0
-  while (i < n)
+  else
   {
-    dst[i] = '\0';
-    i++;
+    // int dst_p = 0;
+    // int src_p = 0;
+    // while (src[src_p])
+    // {
+    //   dst[dst_p++] = src[src_p++];
+    // }
+    // dst[dst_p] = '\0';
+    size_t i;
+    for (i = 0; i < n && src[i] != '\0'; i++)
+    {
+      dst[i] = src[i];
+    }
+    while (i < n)
+    {
+      dst[i] = '\0';
+      i++;
+    }
   }
   // 使用\0进行补全
   return dst;
@@ -120,6 +153,7 @@ char *strcat(char *dst, const char *src)
 
 void *memset(void *s, int c, size_t n)
 {
+  assert(s);
   for (int i = 0; i < n; i++)
   {
     *((uint8_t *)s + i) = c;
@@ -127,18 +161,10 @@ void *memset(void *s, int c, size_t n)
   return s;
 }
 
-void *memmove(void *dst, const void *src, size_t n)
-{
-  panic("Not implemented");
-}
-
-void *memcpy(void *out, const void *in, size_t n)
-{
-  panic("Not implemented");
-}
-
 int memcmp(const void *s1, const void *s2, size_t n)
 {
+  assert(s1);
+  assert(s2);
   for (int i = 0; i < n; i++)
   {
     if (*((uint8_t *)s1 + i) < *((uint8_t *)s2 + i))
@@ -152,4 +178,35 @@ int memcmp(const void *s1, const void *s2, size_t n)
   }
   return 0;
 }
+
+// support overlap 
+void *memmove(void *dst, const void *src, size_t n)
+{
+  assert(src);
+  assert(dst);
+
+  strncpy((char *)dst, (char *)src, n);
+
+  return dst;
+}
+
+// not support overlap
+void *memcpy(void *out, const void *in, size_t n)
+{
+  assert(in);
+  assert(out);
+
+  size_t i;
+  for (i = 0; i < n && ((uint8_t*)in)[i] != '\0'; i++)
+  {
+    ((uint8_t*)out)[i] =((uint8_t*)in)[i];
+  }
+  while (i < n)
+  {
+    ((uint8_t*)out)[i] = '\0';
+    i++;
+  }
+  return out;  
+}
+
 #endif
