@@ -9,7 +9,11 @@
 extern "C" {
 #endif
 
-#define __NATIVE_USE_KLIB__
+
+#define MAX(a,b) (((a)>(b))?(a):(b))
+#define MIN(a,b) (((a)<(b))?(a):(b))
+
+// #define __NATIVE_USE_KLIB__
 
 // string.h
 void  *memset    (void *s, int c, size_t n);

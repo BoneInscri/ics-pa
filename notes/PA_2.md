@@ -2077,7 +2077,33 @@ The strncmp() function is similar, **except it compares only the first (at most)
 
 
 
+112. 直接将glibc中的测试拿过来用
 
+
+
+113. 利用native的机器进行输出！并整理结果放到代码中
+
+```shell
+make ARCH=native run
+```
+
+
+
+注意将 
+
+```c
+#define __NATIVE_USE_KLIB__
+```
+
+注释掉
+
+
+
+
+
+114. vprintf
+
+The  functions  vprintf(),  vfprintf(),  vdprintf(),  vsprintf(),  vsnprintf()  are  equivalent to the functions printf(), fprintf(), dprintf(), sprintf(), snprintf(), respectively, **except that they are called with a va_list instead of a variable number of arguments.**
 
 
 
