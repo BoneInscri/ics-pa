@@ -8,7 +8,7 @@
 
 2. **什么是取指？**
 
-取指(instruction fetch, IF)
+取指(instruction fetch， IF)
 
 根据PC所表示的地址，从内存中取出内容，这个内容就是指令。
 
@@ -16,7 +16,7 @@
 
 3. **什么是译码？**
 
-译码(instruction decode, ID)
+译码(instruction decode， ID)
 
 指令本身就是一个01串，根据指令集的规则，将01串翻译出操作数和操作码就是译码的过程！
 
@@ -30,7 +30,7 @@
 
 4. **什么是执行指令？**
 
- 执行(execute, EX)
+ 执行(execute， EX)
 
 根据译码的结果对数据进行操作！
 
@@ -63,32 +63,32 @@ CPU 执行完当前指令后，就将PC加上刚执行完的指令的长度！
 
 // 定义指令格式
 typedef union {
-  struct { uint8_t rs : 2, rt : 2, op : 4; } rtype;
+  struct { uint8_t rs : 2， rt : 2， op : 4; } rtype;
   // 2 + 2 + 4
-  struct { uint8_t addr : 4      , op : 4; } mtype;
+  struct { uint8_t addr : 4      ， op : 4; } mtype;
   // 4 + 4
   uint8_t inst;
   // 指令寄存器（存放从内存读取到的指令）
 } inst_t;
 
-#define DECODE_R(inst) uint8_t rt = (inst).rtype.rt, rs = (inst).rtype.rs
+#define DECODE_R(inst) uint8_t rt = (inst).rtype.rt， rs = (inst).rtype.rs
 // R型指令译码
 // rs 和 rt寄存器
 #define DECODE_M(inst) uint8_t addr = (inst).mtype.addr
 // M型指令译码
 // 操作的地址 addr
 
-uint8_t pc = 0;       // PC, C语言中没有4位的数据类型, 我们采用8位类型来表示
+uint8_t pc = 0;       // PC， C语言中没有4位的数据类型， 我们采用8位类型来表示
 uint8_t R[NREG] = {}; // 寄存器
-uint8_t M[NMEM] = {   // 内存, 其中包含一个计算z = x + y的程序
-  0b11100110,  // load  6#     | R[0] <- M[y]
-  0b00000100,  // mov   r1, r0 | R[1] <- R[0]
-  0b11100101,  // load  5#     | R[0] <- M[x]
-  0b00010001,  // add   r0, r1 | R[0] <- R[0] + R[1]
-  0b11110111,  // store 7#     | M[z] <- R[0]
-  0b00010000,  // x = 16
-  0b00100001,  // y = 33
-  0b00000000,  // z = 0
+uint8_t M[NMEM] = {   // 内存， 其中包含一个计算z = x + y的程序
+  0b11100110，  // load  6#     | R[0] <- M[y]
+  0b00000100，  // mov   r1， r0 | R[1] <- R[0]
+  0b11100101，  // load  5#     | R[0] <- M[x]
+  0b00010001，  // add   r0， r1 | R[0] <- R[0] + R[1]
+  0b11110111，  // store 7#     | M[z] <- R[0]
+  0b00010000，  // x = 16
+  0b00100001，  // y = 33
+  0b00000000，  // z = 0
 };
 
 int halt = 0; // 结束标志
@@ -104,7 +104,7 @@ void exec_once() {
     case 0b1110: { DECODE_M(this); R[0]    = M[addr]; break; }
     case 0b1111: { DECODE_M(this); M[addr] = R[0];    break; }
     default:
-      printf("Invalid instruction with opcode = %x, halting...\n", this.rtype.op);
+      printf("Invalid instruction with opcode = %x， halting...\n"， this.rtype.op);
       halt = 1;
       break;
   }
@@ -116,7 +116,7 @@ int main() {
     exec_once();
     if (halt) break;
   }
-  printf("The result of 16 + 33 is %d\n", M[7]);
+  printf("The result of 16 + 33 is %d\n"， M[7]);
   return 0;
 }
 ```
@@ -159,7 +159,7 @@ CISC的一个特性，不惜使用复杂的指令格式，牺牲硬件的开发�
 - `0`表示相应的位只能匹配`0`
 - `1`表示相应的位只能匹配`1`
 - `?`表示相应的位可以匹配`0`或`1`
-- 空格是分隔符, 只用于提升模式字符串的可读性, 不参与匹配
+- 空格是分隔符， 只用于提升模式字符串的可读性， 不参与匹配
 
 1. 指令名称
 2. 指令类型
@@ -307,16 +307,16 @@ imm 长度不固定。
 
 
 ```
-00000413          	li	s0,0
+00000413          	li	s0，0
 == 
-00000413 addi    s0, zero, 0
+00000413 addi    s0， zero， 0
 ```
 
 ![image-20231112150544584](PA_2.assets/image-20231112150544584.png)
 
 ![image-20231112152116654](PA_2.assets/image-20231112152116654.png)
 
-**LUI (load upper immediate)** is used to build 32-bit constants and uses the U-type format. LUI places the 32-bit U-immediate value into the destination register rd, filling in the lowest 12 bits with zeros
+**LUI (load upper immediate)** is used to build 32-bit constants and uses the U-type format. LUI places the 32-bit U-immediate value into the destination register rd， filling in the lowest 12 bits with zeros
 
 rd寄存器中的低12位为0，高20位为立即数 imm！
 
@@ -331,7 +331,7 @@ rd寄存器中的低12位为0，高20位为立即数 imm！
 ==ADDI指令==
 
 ```
-00000413 addi    s0, zero, 0
+00000413 addi    s0， zero， 0
 ```
 
 ![image-20231112152830799](PA_2.assets/image-20231112152830799.png)
@@ -340,7 +340,7 @@ rd寄存器中的低12位为0，高20位为立即数 imm！
 
 ![image-20231112152916113](PA_2.assets/image-20231112152916113.png)
 
-ADDI adds the sign-extended 12-bit immediate to register rs1. Arithmetic overflow is ignored and the result is simply the low XLEN bits of the result. **ADDI rd, rs1, 0 is used to implement the MV rd, rs1 assembler pseudo instruction.**
+ADDI adds the sign-extended 12-bit immediate to register rs1. Arithmetic overflow is ignored and the result is simply the low XLEN bits of the result. **ADDI rd， rs1， 0 is used to implement the MV rd， rs1 assembler pseudo instruction.**
 
 rd = rs1 + imm
 
@@ -353,7 +353,7 @@ rd = rs1 + imm
 ==JAL指令==
 
 ```
-00c000ef          	jal	ra,80000018
+00c000ef          	jal	ra，80000018
 ```
 
 ![image-20231112154208018](PA_2.assets/image-20231112154208018.png)
@@ -362,7 +362,7 @@ rd = rs1 + imm
 
 ![image-20231112154751580](PA_2.assets/image-20231112154751580.png)
 
-The jump and link (JAL) instruction uses the J-type format, where the J-immediate encodes a signed offset in multiples of 2 bytes. The offset is sign-extended and added to the address of the jump instruction to form the jump target address. Jumps can therefore target a ±1 MiB range.
+The jump and link (JAL) instruction uses the J-type format， where the J-immediate encodes a signed offset in multiples of 2 bytes. The offset is sign-extended and added to the address of the jump instruction to form the jump target address. Jumps can therefore target a ±1 MiB range.
 
 JAL stores the address of the instruction that follows the JAL (pc+4) into register rd. The standard software calling convention uses x1 as the return address register and x5 as an alternate link register.
 
@@ -414,7 +414,7 @@ fe9ff0ef
 
 The indirect jump instruction JALR (jump and link register) uses the I-type encoding. 
 
-The target address is obtained by adding the **sign-extended** 12-bit I-immediate to the register rs1, then setting the least-significant bit of the result to zero. The address of the instruction following the jump (pc+4) is written to register rd. Register x0 can be used as the destination if the result is not required.
+The target address is obtained by adding the **sign-extended** 12-bit I-immediate to the register rs1， then setting the least-significant bit of the result to zero. The address of the instruction following the jump (pc+4) is written to register rd. Register x0 can be used as the destination if the result is not required.
 
 该指令将PC设置为rs1寄存器中的值加上符号位扩展的偏移量，把计算出地址的最低有效位设为0，并将原PC + 4的值写入rd寄存器。如果不需要目的寄存器，可以将rd设置为x0。
 
@@ -429,7 +429,7 @@ x[rd]=t
 ret 指令，伪指令
 
 ```
-00008067 jalr    zero, 0(ra)
+00008067 jalr    zero， 0(ra)
 ```
 
 
@@ -485,7 +485,7 @@ Overflows are ignored and the low XLEN bits of results are written to the destin
 伪指令
 
 ```
-seqz	a0,a0
+seqz	a0，a0
 ```
 
 实际是`sltiu`
@@ -500,13 +500,13 @@ seqz	a0,a0
 
 ![image-20231112202200855](PA_2.assets/image-20231112202200855.png)
 
-SLTI (set less than immediate) places the value 1 in register rd if register rs1 **is less than** the sign-extended immediate when both are treated as signed numbers, else 0 is written to rd. 
+SLTI (set less than immediate) places the value 1 in register rd if register rs1 **is less than** the sign-extended immediate when both are treated as signed numbers， else 0 is written to rd. 
 
-SLTIU is similar but compares the values as unsigned numbers (i.e., the immediate is first sign-extended to XLEN bits then treated as an unsigned number). 
+SLTIU is similar but compares the values as unsigned numbers (i.e.， the immediate is first sign-extended to XLEN bits then treated as an unsigned number). 
 
-Note, ==SLTIU rd, rs1, 1 sets rd to 1 if rs1 equals zero, otherwise sets rd to 0== 
+Note， ==SLTIU rd， rs1， 1 sets rd to 1 if rs1 equals zero， otherwise sets rd to 0== 
 
-(assembler pseudo instruction **SEQZ rd, rs**).
+(assembler pseudo instruction **SEQZ rd， rs**).
 
 ```
 00153513
@@ -524,7 +524,7 @@ Note, ==SLTIU rd, rs1, 1 sets rd to 1 if rs1 equals zero, otherwise sets rd to 0
 beqz 是它的伪指令！
 
 ```
-00050463          	beqz	a0,80000018
+00050463          	beqz	a0，80000018
 
 0000_000  00000  01010  000_0100_0110_0011
 
@@ -546,9 +546,9 @@ Branch instructions compare two registers.
 
 BEQ and BNE take the branch **if registers rs1 and rs2 are equal or unequal respectively**. 
 
-BLT and BLTU take the branch if rs1 is less than rs2, using signed and unsigned comparison respectively. 
+BLT and BLTU take the branch if rs1 is less than rs2， using signed and unsigned comparison respectively. 
 
-BGE and BGEU take the branch if rs1 is greater than or equal to rs2, using signed and unsigned comparison respectively. Note, BGT, BGTU, BLE, and BLEU can be synthesized by reversing the operands to BLT, BLTU, BGE, and BGEU, respectively.
+BGE and BGEU take the branch if rs1 is greater than or equal to rs2， using signed and unsigned comparison respectively. Note， BGT， BGTU， BLE， and BLEU can be synthesized by reversing the operands to BLT， BLTU， BGE， and BGEU， respectively.
 
 fe8990e3
 
@@ -571,7 +571,7 @@ fd8a12e3
 ==ADDIW指令==
 
 ```
-008a0a1b          	addiw	s4,s4,8
+008a0a1b          	addiw	s4，s4，8
 ```
 
 ![image-20231112210702867](PA_2.assets/image-20231112210702867.png)
@@ -582,7 +582,7 @@ fd8a12e3
 
 ADDIW is an RV64I instruction that **adds the sign-extended 12-bit immediate to register rs1 and produces the proper sign-extension of a 32-bit result in rd.** 
 
-Overflows are ignored and the result is the low 32 bits **of the result sign-extended to 64 bits**. Note, ADDIW rd, rs1, 0 writes the sign-extension of the lower 32 bits of register rs1 into register rd 
+Overflows are ignored and the result is the low 32 bits **of the result sign-extended to 64 bits**. Note， ADDIW rd， rs1， 0 writes the sign-extension of the lower 32 bits of register rs1 into register rd 
 
  **(assembler pseudo instruction SEXT.W).**
 
@@ -631,7 +631,7 @@ add-longlong
 ==LW指令？==
 
 ```
-000aa903          	lw	s2,0(s5)
+000aa903          	lw	s2，0(s5)
 ```
 
 Load and store instructions **transfer a value between the registers and memory.** 
@@ -644,7 +644,7 @@ Stores copy the value in register rs2 to memory.
 
 **The LW instruction loads a 32-bit value from memory into rd.** 
 
-LH loads a 16-bit value from memory, then sign-extends to 32-bits before storing in rd. 
+LH loads a 16-bit value from memory， then sign-extends to 32-bits before storing in rd. 
 
 ![image-20231112211503863](PA_2.assets/image-20231112211503863.png)
 
@@ -661,7 +661,7 @@ LH loads a 16-bit value from memory, then sign-extends to 32-bits before storing
 ==ADDW指令？==
 
 ```
-0125053b          	addw	a0,a0,s2
+0125053b          	addw	a0，a0，s2
 ```
 
 ![image-20231112212019751](PA_2.assets/image-20231112212019751.png)
@@ -672,7 +672,7 @@ LH loads a 16-bit value from memory, then sign-extends to 32-bits before storing
 
 ADDW and SUBW are RV64I-only instructions that are defined analogously to ADD and SUB but operate on 32-bit values and produce signed 32-bit results.
 
-Overflows are ignored, and the low 32-bits of the result is sign-extended to 64-bits and written to the destination register.
+Overflows are ignored， and the low 32-bits of the result is sign-extended to 64-bits and written to the destination register.
 
 
 
@@ -687,7 +687,7 @@ Overflows are ignored, and the low 32-bits of the result is sign-extended to 64-
 ==SH指令==
 
 ```
-00f11423          	sh	a5,8(sp)
+00f11423          	sh	a5，8(sp)
 ```
 
 ![image-20231113142735256](PA_2.assets/image-20231113142735256.png)
@@ -696,14 +696,14 @@ Overflows are ignored, and the low 32-bits of the result is sign-extended to 64-
 
 LB and LBU are defined **analogously** for 8-bit values. 
 
-The SW, SH, and SB instructions store 32-bit, **16-bit**, and 8-bit values from the low bits of register rs2 to memory.
+The SW， SH， and SB instructions store 32-bit， **16-bit**， and 8-bit values from the low bits of register rs2 to memory.
 
 
 
 ==SRAI指令==
 
 ```
-4035d793          	srai	a5,a1,0x3
+4035d793          	srai	a5，a1，0x3
 ```
 
 
@@ -716,7 +716,7 @@ The SW, SH, and SB instructions store 32-bit, **16-bit**, and 8-bit values from 
 
 Shifts by a constant are encoded as a specialization of the **I-type format**. 
 
-The operand to be shifted is in rs1, and the shift amount is encoded **in the lower 5 bits of the I-immediate field**. The right shift type is encoded **in bit 30.** 
+The operand to be shifted is in rs1， and the shift amount is encoded **in the lower 5 bits of the I-immediate field**. The right shift type is encoded **in bit 30.** 
 
 - SLLI is a logical left shift (zeros are shifted into the lower bits); 
 - SRLI is a logical right shift (**zeros** are shifted into the upper bits); 
@@ -729,7 +729,7 @@ The operand to be shifted is in rs1, and the shift amount is encoded **in the lo
 ==LBU指令==
 
 ```
-00054503          	lbu	a0,0(a0)
+00054503          	lbu	a0，0(a0)
 ```
 
 ![image-20231113144655313](PA_2.assets/image-20231113144655313.png)
@@ -738,7 +738,7 @@ The operand to be shifted is in rs1, and the shift amount is encoded **in the lo
 
 ![image-20231113144801968](PA_2.assets/image-20231113144801968.png)
 
-LB and LBU are defined analogously **for 8-bit values**. The SW, SH, and SB instructions store 32-bit, 16-bit, and 8-bit values from the low bits of register rs2 to memory.
+LB and LBU are defined analogously **for 8-bit values**. The SW， SH， and SB instructions store 32-bit， 16-bit， and 8-bit values from the low bits of register rs2 to memory.
 
 
 
@@ -752,11 +752,11 @@ LB and LBU are defined analogously **for 8-bit values**. The SW, SH, and SB inst
 
 ![image-20231113145155322](PA_2.assets/image-20231113145155322.png)
 
-ANDI, ORI, XORI are logical operations that perform bitwise AND, OR, and XOR on register rs1 and the sign-extended 12-bit immediate and place the result in rd. 
+ANDI， ORI， XORI are logical operations that perform bitwise AND， OR， and XOR on register rs1 and the sign-extended 12-bit immediate and place the result in rd. 
 
-Note, XORI rd, rs1, -1 performs a bitwise logical inversion of register rs1
+Note， XORI rd， rs1， -1 performs a bitwise logical inversion of register rs1
 
- **(assembler pseudo instruction NOT rd, rs).**
+ **(assembler pseudo instruction NOT rd， rs).**
 
 
 
@@ -765,12 +765,12 @@ Note, XORI rd, rs1, -1 performs a bitwise logical inversion of register rs1
 ==SLLW指令==
 
 ```
-00b797bb          	sllw	a5,a5,a1
+00b797bb          	sllw	a5，a5，a1
 ```
 
 ![image-20231113145452163](PA_2.assets/image-20231113145452163.png)
 
-SLLW, SRLW, and SRAW are RV64I-only instructions that are analogously defined **but operate on 32-bit values and sign-extend their 32-bit results to 64 bits.** 
+SLLW， SRLW， and SRAW are RV64I-only instructions that are analogously defined **but operate on 32-bit values and sign-extend their 32-bit results to 64 bits.** 
 
 The shift amount is given by **rs2[4:0].**
 
@@ -780,7 +780,7 @@ The shift amount is given by **rs2[4:0].**
 
 logical left !
 
-**SLL, SRL, and SRA** perform **logical left, logical right, and arithmetic right shifts** on the value in register rs1 by the shift amount held in register rs2. In RV64I, only the **low 6 bits of rs2** are considered for the shift amount
+**SLL， SRL， and SRA** perform **logical left， logical right， and arithmetic right shifts** on the value in register rs1 by the shift amount held in register rs2. In RV64I， only the **low 6 bits of rs2** are considered for the shift amount
 
 
 
@@ -789,7 +789,7 @@ logical left !
 ==AND指令==
 
 ```
-00f57533          	and	a0,a0,a5
+00f57533          	and	a0，a0，a5
 ```
 
 ![image-20231113150734495](PA_2.assets/image-20231113150734495.png)
@@ -798,7 +798,7 @@ logical left !
 
 ![image-20231113150910760](PA_2.assets/image-20231113150910760.png)
 
-AND, OR, and XOR perform bitwise logical operations
+AND， OR， and XOR perform bitwise logical operations
 
 
 
@@ -807,7 +807,7 @@ AND, OR, and XOR perform bitwise logical operations
 ==SLTU指令==
 
 ```
-00a03533          	snez	a0,a0
+00a03533          	snez	a0，a0
 ```
 
 ![image-20231113151412378](PA_2.assets/image-20231113151412378.png)
@@ -816,9 +816,9 @@ AND, OR, and XOR perform bitwise logical operations
 
 又是一个伪指令。
 
-SLT and SLTU perform signed and unsigned compares respectively, writing 1 to rd if rs1 < rs2, 0 otherwise. 
+SLT and SLTU perform signed and unsigned compares respectively， writing 1 to rd if rs1 < rs2， 0 otherwise. 
 
-Note, SLTU rd, x0, rs2 sets rd to 1 if rs2 is not equal to zero, otherwise sets rd to zero (**assembler pseudo instruction SNEZ rd, rs**). 
+Note， SLTU rd， x0， rs2 sets rd to 1 if rs2 is not equal to zero， otherwise sets rd to zero (**assembler pseudo instruction SNEZ rd， rs**). 
 
 
 
@@ -827,18 +827,18 @@ Note, SLTU rd, x0, rs2 sets rd to 1 if rs2 is not equal to zero, otherwise sets 
 ==XORI指令==
 
 ```
-00154513          	xori	a0,a0,1
+00154513          	xori	a0，a0，1
 ```
 
 ![image-20231113151814836](PA_2.assets/image-20231113151814836.png)
 
 ![image-20231113144801968](PA_2.assets/image-20231113144801968.png)
 
-ANDI, ORI, XORI are logical operations that perform bitwise AND, OR, and XOR on register rs1 and the sign-extended 12-bit immediate and place the result in rd. 
+ANDI， ORI， XORI are logical operations that perform bitwise AND， OR， and XOR on register rs1 and the sign-extended 12-bit immediate and place the result in rd. 
 
-Note, XORI rd, rs1, -1 performs a bitwise logical inversion of register rs1
+Note， XORI rd， rs1， -1 performs a bitwise logical inversion of register rs1
 
- **(assembler pseudo instruction NOT rd, rs).**
+ **(assembler pseudo instruction NOT rd， rs).**
 
 
 
@@ -847,14 +847,14 @@ Note, XORI rd, rs1, -1 performs a bitwise logical inversion of register rs1
 ==OR指令==
 
 ```
-00e7e7b3          	or	a5,a5,a4
+00e7e7b3          	or	a5，a5，a4
 ```
 
 ![image-20231113152146542](PA_2.assets/image-20231113152146542.png)
 
 ![image-20231113145600159](PA_2.assets/image-20231113145600159.png)
 
-AND, OR, and XOR perform bitwise logical operations
+AND， OR， and XOR perform bitwise logical operations
 
 
 
@@ -863,14 +863,14 @@ AND, OR, and XOR perform bitwise logical operations
 ==SB指令==
 
 ```
-00f70023          	sb	a5,0(a4)
+00f70023          	sb	a5，0(a4)
 ```
 
 ![image-20231113152320040](PA_2.assets/image-20231113152320040.png)
 
 ![image-20231113152333821](PA_2.assets/image-20231113152333821.png)
 
-The SD, SW, SH, and SB instructions store 64-bit, 32-bit, 16-bit, and **8-bit** values from the low bits of register rs2 to memory respectively.
+The SD， SW， SH， and SB instructions store 64-bit， 32-bit， 16-bit， and **8-bit** values from the low bits of register rs2 to memory respectively.
 
 
 
@@ -881,7 +881,7 @@ The SD, SW, SH, and SB instructions store 64-bit, 32-bit, 16-bit, and **8-bit** 
 ==SLLI指令==
 
 ```
-00b797bb          	sllw	a5,a5,a1
+00b797bb          	sllw	a5，a5，a1
 ```
 
 ![image-20231113153123933](PA_2.assets/image-20231113153123933.png)
@@ -898,35 +898,35 @@ SRAI is an arithmetic right shift (the original sign bit is copied into the vaca
 
 Shifts by a constant are encoded as a specialization of the I-type format using the same instruction opcode as RV32I. 
 
-The operand to **be shifted is in rs1, and the shift amount is encoded in the lower 6 bits of the I-immediate field for RV64I**. The right shift type is encoded in **bit 30**.
+The operand to **be shifted is in rs1， and the shift amount is encoded in the lower 6 bits of the I-immediate field for RV64I**. The right shift type is encoded in **bit 30**.
 
 
 
 ==BGE指令==
 
 ```
-00e6d663          	bge	a3,a4,80000064
+00e6d663          	bge	a3，a4，80000064
 ```
 
 ![image-20231113153936400](PA_2.assets/image-20231113153936400.png)
 
 ![image-20231112203147893](PA_2.assets/image-20231112203147893.png)
 
-**BGE** and BGEU take the branch **if rs1 is greater than or equal to rs2**, using **signed** and unsigned comparison respectively. Note, BGT, BGTU, BLE, and BLEU can be **synthesized** by reversing the operands to BLT, BLTU, BGE, and BGEU, respectively.
+**BGE** and BGEU take the branch **if rs1 is greater than or equal to rs2**， using **signed** and unsigned comparison respectively. Note， BGT， BGTU， BLE， and BLEU can be **synthesized** by reversing the operands to BLT， BLTU， BGE， and BGEU， respectively.
 
 
 
 ==SW指令==
 
 ```
-00d7a023          	sw	a3,0(a5)
+00d7a023          	sw	a3，0(a5)
 ```
 
 ![image-20231113154314051](PA_2.assets/image-20231113154314051.png)
 
 ![image-20231113142824763](PA_2.assets/image-20231113142824763.png)
 
-The SW, SH, and SB instructions store **32-bit**, 16-bit, and 8-bit values from the low bits of register rs2 to memory.
+The SW， SH， and SB instructions store **32-bit**， 16-bit， and 8-bit values from the low bits of register rs2 to memory.
 
 
 
@@ -937,7 +937,7 @@ The SW, SH, and SB instructions store **32-bit**, 16-bit, and 8-bit values from 
 ==LUI指令==
 
 ```
-edb88337          	lui	t1,0xedb88
+edb88337          	lui	t1，0xedb88
 ```
 
 ![image-20231113154725374](PA_2.assets/image-20231113154725374.png)
@@ -948,14 +948,14 @@ edb88337          	lui	t1,0xedb88
 
 LUI (**load upper immediate**) is used to build 32-bit constants and uses the U-type format. 
 
-LUI places the 32-bit U-immediate value into the destination register rd, filling in the lowest 12 bits with zeros.
+LUI places the 32-bit U-immediate value into the destination register rd， filling in the lowest 12 bits with zeros.
 
 
 
 ==SRLIW指令==
 
 ```
-0017d69b          	srliw	a3,a5,0x1
+0017d69b          	srliw	a3，a5，0x1
 ```
 
 ![image-20231113154943270](PA_2.assets/image-20231113154943270.png)
@@ -964,10 +964,10 @@ LUI places the 32-bit U-immediate value into the destination register rd, fillin
 
 ![image-20231113155029489](PA_2.assets/image-20231113155029489.png)
 
-SLLIW, **SRLIW**, and SRAIW are RV64I-only instructions that are analogously defined but operate on **32-bit values and sign-extend their 32-bit results to 64 bits**. SLLIW, SRLIW, and SRAIW encodings with **imm[5] ̸= 0 are reserved**.
+SLLIW， **SRLIW**， and SRAIW are RV64I-only instructions that are analogously defined but operate on **32-bit values and sign-extend their 32-bit results to 64 bits**. SLLIW， SRLIW， and SRAIW encodings with **imm[5] ̸= 0 are reserved**.
 
-Previously, SLLIW, SRLIW, and SRAIW with **imm[5] ̸= 0** were defined to cause illegal in-
-struction exceptions, whereas now they are marked as reserved. This is a backwards-compatible
+Previously， SLLIW， SRLIW， and SRAIW with **imm[5] ̸= 0** were defined to cause illegal in-
+struction exceptions， whereas now they are marked as reserved. This is a backwards-compatible
 change.
 
 逻辑右移！
@@ -991,14 +991,14 @@ change.
 ==BGEU指令==
 
 ```
-02c5fe63          	bgeu	a1,a2,800000d0
+02c5fe63          	bgeu	a1，a2，800000d0
 ```
 
 ![image-20231113155803422](PA_2.assets/image-20231113155803422.png)
 
 ![image-20231113155832281](PA_2.assets/image-20231113155832281.png)
 
-BGE and **BGEU** take the branch **if rs1 is greater than or equal to rs2**, using signed and **unsigned comparison respectively**. Note, BGT, BGTU, BLE, and BLEU can be synthesized by reversing the operands to BLT, BLTU, BGE, and BGEU, respectively.
+BGE and **BGEU** take the branch **if rs1 is greater than or equal to rs2**， using signed and **unsigned comparison respectively**. Note， BGT， BGTU， BLE， and BLEU can be synthesized by reversing the operands to BLT， BLTU， BGE， and BGEU， respectively.
 
 
 
@@ -1014,7 +1014,7 @@ BGE and **BGEU** take the branch **if rs1 is greater than or equal to rs2**, usi
 
 ![image-20231113161310104](PA_2.assets/image-20231113161310104.png)
 
-MULW is an RV64 instruction that multiplies **the lower 32 bits of the source registers**, placing the **sign-extension of the lower 32 bits** of the result into the destination register.
+MULW is an RV64 instruction that multiplies **the lower 32 bits of the source registers**， placing the **sign-extension of the lower 32 bits** of the result into the destination register.
 
 
 
@@ -1023,7 +1023,7 @@ MULW is an RV64 instruction that multiplies **the lower 32 bits of the source re
 ==DIVW指令==
 
 ```
-02f7473b          	divw	a4,a4,a5
+02f7473b          	divw	a4，a4，a5
 ```
 
 ![image-20231113161656743](PA_2.assets/image-20231113161656743.png)
@@ -1032,7 +1032,7 @@ MULW is an RV64 instruction that multiplies **the lower 32 bits of the source re
 
 ![image-20231113161310104](PA_2.assets/image-20231113161310104.png)
 
-**DIVW** and DIVUW are RV64 instructions that **divide the lower 32 bits of rs1 by the lower 32 bits of rs2,** treating them as **signed** and **unsigned** integers respectively, placing the 32-bit quotient in rd, **sign-extended to 64 bits**
+**DIVW** and DIVUW are RV64 instructions that **divide the lower 32 bits of rs1 by the lower 32 bits of rs2，** treating them as **signed** and **unsigned** integers respectively， placing the 32-bit quotient in rd， **sign-extended to 64 bits**
 
 
 
@@ -1041,14 +1041,14 @@ MULW is an RV64 instruction that multiplies **the lower 32 bits of the source re
 ==REMW指令==
 
 ```
-02f667bb          	remw	a5,a2,a5
+02f667bb          	remw	a5，a2，a5
 ```
 
 ![image-20231113162236749](PA_2.assets/image-20231113162236749.png)
 
 ![image-20231113161310104](PA_2.assets/image-20231113161310104.png)
 
-**REMW** and **REMUW** are RV64 instructions that provide the corresponding **signed** and **unsigned** remainder operations respectively. Both REMW and REMUW always sign-extend the 32-bit result to 64 bits, including on a divide by zero.
+**REMW** and **REMUW** are RV64 instructions that provide the corresponding **signed** and **unsigned** remainder operations respectively. Both REMW and REMUW always sign-extend the 32-bit result to 64 bits， including on a divide by zero.
 
 取余！
 
@@ -1059,7 +1059,7 @@ MULW is an RV64 instruction that multiplies **the lower 32 bits of the source re
 35. **hello-str测试发现**
 
 ```
-01d79793          	slli	a5,a5,0x1d
+01d79793          	slli	a5，a5，0x1d
 ```
 
 这个指令有问题？
@@ -1085,14 +1085,14 @@ MULW is an RV64 instruction that multiplies **the lower 32 bits of the source re
 ==BLT指令==
 
 ```
-02f94063          	blt	s2,a5,800000a0
+02f94063          	blt	s2，a5，800000a0
 ```
 
 ![image-20231113165205952](PA_2.assets/image-20231113165205952.png)
 
 ![image-20231113165214641](PA_2.assets/image-20231113165214641.png)
 
-BLT and BLTU take the branch **if rs1 is less than rs2**, using **signed** and **unsigned** comparison respectively.
+BLT and BLTU take the branch **if rs1 is less than rs2**， using **signed** and **unsigned** comparison respectively.
 
 
 
@@ -1101,14 +1101,14 @@ BLT and BLTU take the branch **if rs1 is less than rs2**, using **signed** and *
 ==SLT指令==
 
 ```
-00fa2733          	slt	a4,s4,a5
+00fa2733          	slt	a4，s4，a5
 ```
 
 ![image-20231113165409957](PA_2.assets/image-20231113165409957.png)
 
 ![image-20231113165420452](PA_2.assets/image-20231113165420452.png)
 
-SLT and SLTU perform **signed** and **unsigned** compares respectively, writing 1 to rd if rs1 < rs2, 0 otherwise. Note, SLTU rd, x0, rs2 sets rd to 1 if rs2 is not equal to zero, otherwise sets rd to zero (**assembler pseudo instruction SNEZ rd, rs).**
+SLT and SLTU perform **signed** and **unsigned** compares respectively， writing 1 to rd if rs1 < rs2， 0 otherwise. Note， SLTU rd， x0， rs2 sets rd to 1 if rs2 is not equal to zero， otherwise sets rd to zero (**assembler pseudo instruction SNEZ rd， rs).**
 
 
 
@@ -1119,14 +1119,14 @@ SLT and SLTU perform **signed** and **unsigned** compares respectively, writing 
 ==LH指令==
 
 ```
-00041503          	lh	a0,0(s0)
+00041503          	lh	a0，0(s0)
 ```
 
 ![image-20231113165813635](PA_2.assets/image-20231113165813635.png)
 
-The LW instruction loads a 32-bit value from memory into rd. **LH loads a 16-bit value from memory, then sign-extends to 32-bits before storing in rd.**
+The LW instruction loads a 32-bit value from memory into rd. **LH loads a 16-bit value from memory， then sign-extends to 32-bits before storing in rd.**
 
-LH and **LHU** are defined analogously for 16-bit values, as are LB and LBU for 8-bit values. The SD, SW, SH, and SB instructions store 64-bit, 32-bit, 16-bit, and 8-bit values from the low bits of register rs2 to memory respectively.
+LH and **LHU** are defined analogously for 16-bit values， as are LB and LBU for 8-bit values. The SD， SW， SH， and SB instructions store 64-bit， 32-bit， 16-bit， and 8-bit values from the low bits of register rs2 to memory respectively.
 
 
 
@@ -1136,20 +1136,20 @@ LH and **LHU** are defined analogously for 16-bit values, as are LB and LBU for 
 
 The LW instruction loads a 32-bit value from memory into rd.
 
-**LH** loads a 16-bit value from memory, then **sign-extends** to 32-bits before storing in rd. 
+**LH** loads a 16-bit value from memory， then **sign-extends** to 32-bits before storing in rd. 
 
 **LHU** loads a 16-bit value from memory but then **zero extends** to 32-bits before storing in rd. 
 
 
 
-LB and LBU are defined analogously for 8-bit values. The SW, SH, and SB instructions store 32-bit, 16-bit, and 8-bit values from the low bits of register rs2 to memory.
+LB and LBU are defined analogously for 8-bit values. The SW， SH， and SB instructions store 32-bit， 16-bit， and 8-bit values from the low bits of register rs2 to memory.
 
 
 
 ==SUBW指令==
 
 ```
-413a09bb          	subw	s3,s4,s3
+413a09bb          	subw	s3，s4，s3
 ```
 
 ![image-20231113184049591](PA_2.assets/image-20231113184049591.png)
@@ -1158,7 +1158,7 @@ LB and LBU are defined analogously for 8-bit values. The SW, SH, and SB instruct
 
 ![image-20231113184145228](PA_2.assets/image-20231113184145228.png)
 
-**ADDW** and **SUBW** are RV64I-only instructions that are defined analogously to ADD and SUB but operate on 32-bit values and produce signed 32-bit results. Overflows are ignored, and the low 32-bits of the result is **sign-extended** to 64-bits and written to the destination register.
+**ADDW** and **SUBW** are RV64I-only instructions that are defined analogously to ADD and SUB but operate on 32-bit values and produce signed 32-bit results. Overflows are ignored， and the low 32-bits of the result is **sign-extended** to 64-bits and written to the destination register.
 
 
 
@@ -1167,7 +1167,7 @@ LB and LBU are defined analogously for 8-bit values. The SW, SH, and SB instruct
 ==SRLI指令==
 
 ```
-0307d793          	srli	a5,a5,0x30
+0307d793          	srli	a5，a5，0x30
 ```
 
 ![image-20231113191005031](PA_2.assets/image-20231113191005031.png)
@@ -1193,7 +1193,7 @@ SRAI is an arithmetic right shift (the original sign bit is copied into the vaca
 ==SLLIW指令==
 
 ```
-0015959b          	slliw	a1,a1,0x1
+0015959b          	slliw	a1，a1，0x1
 ```
 
 ![image-20231113203410701](PA_2.assets/image-20231113203410701.png)
@@ -1209,7 +1209,7 @@ SRAI is an arithmetic right shift (the original sign bit is copied into the vaca
 ==MUL指令==
 
 ```
-02f787b3          	mul	a5,a5,a5
+02f787b3          	mul	a5，a5，a5
 ```
 
 ![image-20231113203740970](PA_2.assets/image-20231113203740970.png)
@@ -1225,16 +1225,16 @@ MUL performs an XLEN-bit×XLEN-bit multiplication of rs1 by rs2 and places the l
 ==REM指令==
 
 ```
-02a7e7b3          	rem	a5,a5,a0
+02a7e7b3          	rem	a5，a5，a0
 ```
 
 ![image-20231113204011371](PA_2.assets/image-20231113204011371.png)
 
 ![image-20231113203752637](PA_2.assets/image-20231113203752637.png)
 
-DIV and DIVU perform an XLEN bits by XLEN bits signed and unsigned integer division of rs1 by rs2, rounding towards zero.
+DIV and DIVU perform an XLEN bits by XLEN bits signed and unsigned integer division of rs1 by rs2， rounding towards zero.
 
-REM and REMU provide the remainder of the corresponding division operation. **For REM, the sign of the result equals the sign of the dividend.**
+REM and REMU provide the remainder of the corresponding division operation. **For REM， the sign of the result equals the sign of the dividend.**
 
 
 
@@ -1243,7 +1243,7 @@ REM and REMU provide the remainder of the corresponding division operation. **Fo
 ==SRAIW指令==
 
 ```
-4185551b          	sraiw	a0,a0,0x18
+4185551b          	sraiw	a0，a0，0x18
 ```
 
 ![image-20231113204415731](PA_2.assets/image-20231113204415731.png)
@@ -1259,21 +1259,21 @@ REM and REMU provide the remainder of the corresponding division operation. **Fo
 ==SRAW指令==
 
 ```
-4085553b          	sraw	a0,a0,s0
+4085553b          	sraw	a0，a0，s0
 ```
 
 ![image-20231113212416645](PA_2.assets/image-20231113212416645.png)
 
 ![image-20231113212432064](PA_2.assets/image-20231113212432064.png)
 
-SLLW, SRLW, and **SRAW** are RV64I-only instructions that are analogously defined but **operate on 32-bit values and sign-extend their 32-bit results to 64 bits**. **The shift amount is given by rs2[4:0].**
+SLLW， SRLW， and **SRAW** are RV64I-only instructions that are analogously defined but **operate on 32-bit values and sign-extend their 32-bit results to 64 bits**. **The shift amount is given by rs2[4:0].**
 
 
 
 ==SRLW指令==
 
 ```
-0085553b          	srlw	a0,a0,s0
+0085553b          	srlw	a0，a0，s0
 ```
 
 ![image-20231113212846658](PA_2.assets/image-20231113212846658.png)
@@ -1291,14 +1291,14 @@ SLLW, SRLW, and **SRAW** are RV64I-only instructions that are analogously define
 ==BLTU指令==
 
 ```
-009a6463          	bltu	s4,s1,80000078
+009a6463          	bltu	s4，s1，80000078
 ```
 
 ![image-20231113213140245](PA_2.assets/image-20231113213140245.png)
 
 ![image-20231113213209556](PA_2.assets/image-20231113213209556.png)
 
-BLT and **BLTU** take the branch if rs1 is less than rs2, using signed and **unsigned** comparison respectively. BGE and BGEU take the branch if rs1 is greater than or equal to rs2, using signed and unsigned comparison respectively.
+BLT and **BLTU** take the branch if rs1 is less than rs2， using signed and **unsigned** comparison respectively. BGE and BGEU take the branch if rs1 is greater than or equal to rs2， using signed and unsigned comparison respectively.
 
 
 
@@ -1340,11 +1340,11 @@ bare mental？
 AM = TRM + IOE + CTE + VME + MPE
 ```
 
-- TRM(Turing Machine) - 图灵机, 最简单的运行时环境, 为程序提供基本的计算能力
-- **IOE**(I/O Extension) - **输入输出扩展,** 为程序提供输出输入的能力
-- **CTE**(Context Extension) - **上下文扩展**, 为程序提供上下文管理的能力
-- **VME**(Virtual Memory Extension) - **虚存扩展**, 为程序提供虚存管理的能力
-- MPE(Multi-Processor Extension) - 多处理器扩展, 为程序提供多处理器通信的能力 (MPE超出了ICS课程的范围, 在PA中不会涉及)
+- TRM(Turing Machine) - 图灵机， 最简单的运行时环境， 为程序提供基本的计算能力
+- **IOE**(I/O Extension) - **输入输出扩展，** 为程序提供输出输入的能力
+- **CTE**(Context Extension) - **上下文扩展**， 为程序提供上下文管理的能力
+- **VME**(Virtual Memory Extension) - **虚存扩展**， 为程序提供虚存管理的能力
+- MPE(Multi-Processor Extension) - 多处理器扩展， 为程序提供多处理器通信的能力 (MPE超出了ICS课程的范围， 在PA中不会涉及)
 
 
 
@@ -1358,9 +1358,9 @@ AM = TRM + IOE + CTE + VME + MPE
 
 47. **程序运行的流程？**
 
-- 第一条指令从`abstract-machine/am/src/$ISA/nemu/start.S`开始, 设置好栈顶之后就跳转到`abstract-machine/am/src/platform/nemu/trm.c`的`_trm_init()`函数处执行.
-- 在`_trm_init()`中调用`main()`函数执行程序的主体功能, `main()`函数还带一个参数, 目前我们暂时不会用到, 后面我们再介绍它.
-- 从`main()`函数返回后, 调用`halt()`结束运行.
+- 第一条指令从`abstract-machine/am/src/$ISA/nemu/start.S`开始， 设置好栈顶之后就跳转到`abstract-machine/am/src/platform/nemu/trm.c`的`_trm_init()`函数处执行.
+- 在`_trm_init()`中调用`main()`函数执行程序的主体功能， `main()`函数还带一个参数， 目前我们暂时不会用到， 后面我们再介绍它.
+- 从`main()`函数返回后， 调用`halt()`结束运行.
 
 
 
@@ -1385,7 +1385,7 @@ https://homes.cs.washington.edu/~akcheung/papers/apsys12.pdf
 
 50. **int 溢出也是未定义行为？**
 
-int整数溢出的行为是未定义的, 但大部分程序员并不知道这一约定, 甚至连市面上流行的C语言教科书都认为int整数溢出的结果是wrap around。
+int整数溢出的行为是未定义的， 但大部分程序员并不知道这一约定， 甚至连市面上流行的C语言教科书都认为int整数溢出的结果是wrap around。
 
 
 
@@ -1441,7 +1441,7 @@ man sprintf
 
 56. **跟踪指令执行的历史记录就是itrace**
 
-可以通过`grep`, `awk`, `sed`等文本处理工具来对它们进行筛选和处理
+可以通过`grep`， `awk`， `sed`等文本处理工具来对它们进行筛选和处理
 
 build/nemu-log.txt 中可以看到指令的执行记录
 
@@ -1455,7 +1455,7 @@ nemu/src/utils/disasm.cc
 
 57. **实现指令环型缓冲区**
 
-在每执行一条指令的时候, 就把这条指令的信息写入到环形缓冲区中。
+在每执行一条指令的时候， 就把这条指令的信息写入到环形缓冲区中。
 
 如果缓冲区满了，就会覆盖旧的内容。
 
@@ -1632,9 +1632,9 @@ strip -s hello
 
 70. **ftrace 在程序性能优化上的作用？**
 
-统计函数调用的次数, 对访问次数较多的函数进行优化, 可以显著提升程序的性能。
+统计函数调用的次数， 对访问次数较多的函数进行优化， 可以显著提升程序的性能。
 
-过滤出分支跳转指令的执行情况, 作为分支预测器(现代处理器中的一个提升性能的部件)的输入, 来调整分支预测器的实现, 从而提升处理器的性能。
+过滤出分支跳转指令的执行情况， 作为分支预测器(现代处理器中的一个提升性能的部件)的输入， 来调整分支预测器的实现， 从而提升处理器的性能。
 
 
 
@@ -1685,7 +1685,7 @@ sudo apt-get install device-tree-comiler
 
 77. **如何捕获死循环？**
 
-当用户程序陷入死循环时, 让用户程序暂停下来, 并输出相应的提示信息？
+当用户程序陷入死循环时， 让用户程序暂停下来， 并输出相应的提示信息？
 
 
 
@@ -1707,9 +1707,7 @@ https://www.bilibili.com/video/BV1TT4y1k7Yn/?spm_id_from=333.337.search-card.all
 
 79. **什么是通用程序？**
 
-通用程序(Universal Pro
-
-gram)。
+通用程序(Universal Program)。
 
 计算机就是一个通用程序的实体化。
 
@@ -1719,7 +1717,7 @@ gram)。
 
 80. **计算理论的书籍**
 
-Computability, complexity, and languages: fundamentals of theoretical computer science
+Computability， complexity， and languages: fundamentals of theoretical computer science
 
 
 
@@ -1739,7 +1737,7 @@ inc、dec、jne
 
 82. **计算模型**
 
-- Gödel, Herbrand和Kleen研究的**递归函数**
+- Gödel， Herbrand和Kleen研究的**递归函数**
 - Church提出的**λ-演算**
 - Turing提出的**图灵机**
 
@@ -1814,7 +1812,7 @@ CPU可以直接读写寄存器，也可以从设备的状态寄存器中读出�
 
 (port-mapped I/O)
 
-在I/O指令中给出端口号, 就知道要访问哪一个设备寄存器了。
+在I/O指令中给出端口号， 就知道要访问哪一个设备寄存器了。
 
 - in 指令将设备寄存器中的数据传输到CPU寄存器中。
 - out 指令将CPU寄存器中的数据传送到设备寄存器中。
@@ -1829,7 +1827,7 @@ CPU就可以通过普通的访存指令来访问设备。
 
 通过不同的物理内存地址给设备编址。
 
-RISC架构只提供内存映射I/O的编址方式，而PCI-e，网卡，x86的APIC等主流设备, 都支持通过内存映射I/O来访问。
+RISC架构只提供内存映射I/O的编址方式，而PCI-e，网卡，x86的APIC等主流设备， 都支持通过内存映射I/O来访问。
 
 内存映射I/O的编程模型和普通的编程完全一样： 
 
@@ -1895,8 +1893,8 @@ pmem_write()
 
 ```c
 bool ioe_init();
-void ioe_read(int reg, void *buf);
-void ioe_write(int reg, void *buf);
+void ioe_read(int reg， void *buf);
+void ioe_write(int reg， void *buf);
 ```
 
 抽象统一的接口：
@@ -2025,7 +2023,7 @@ make html
 size_t strlen(const char *s);
 ```
 
-The strlen() function calculates the length of the string pointed to by s, excluding the terminating null byte ('\0').
+The strlen() function calculates the length of the string pointed to by s， excluding the terminating null byte ('\0').
 
 
 
@@ -2034,13 +2032,13 @@ The strlen() function calculates the length of the string pointed to by s, exclu
 108. strcpy 需要注意的点：
 
 ```c
-char *strcpy(char *dest, const char *src);
-char *strncpy(char *dest, const char *src, size_t n);
+char *strcpy(char *dest， const char *src);
+char *strncpy(char *dest， const char *src， size_t n);
 ```
 
-The  **strcpy**()  function  copies the string pointed to by src, including the terminating null byte ('\0'), to the buffer pointed to by dest.  The strings may not **overlap**, and the destination string dest must be large enough to receive the copy.
+The  **strcpy**()  function  copies the string pointed to by src， including the terminating null byte ('\0')， to the buffer pointed to by dest.  The strings may not **overlap**， and the destination string dest must be large enough to receive the copy.
 
-If the length of src is less than n, strncpy() **writes additional null bytes to dest** to ensure that **a total of n bytes are written**.
+If the length of src is less than n， strncpy() **writes additional null bytes to dest** to ensure that **a total of n bytes are written**.
 
 <img src="PA_2.assets/image-20231213163246240.png" alt="image-20231213163246240" style="zoom:67%;" />
 
@@ -2067,13 +2065,13 @@ make ARCH=riscv64-nemu mainargs=hello run
 111. strcmp 函数需要注意的点
 
 ```c
-int strcmp(const char *s1, const char *s2);
-int strncmp(const char *s1, const char *s2, size_t n);
+int strcmp(const char *s1， const char *s2);
+int strncmp(const char *s1， const char *s2， size_t n);
 ```
 
 The strcmp()  function  compares the two strings s1 and s2.
 
-The strncmp() function is similar, **except it compares only the first (at most) n bytes of s1 and s2.**
+The strncmp() function is similar， **except it compares only the first (at most) n bytes of s1 and s2.**
 
 
 
@@ -2101,19 +2099,142 @@ make ARCH=native run
 
 
 
-114. vprintf
+114. **vprintf**
 
-The  functions  vprintf(),  vfprintf(),  vdprintf(),  vsprintf(),  vsnprintf()  are  equivalent to the functions printf(), fprintf(), dprintf(), sprintf(), snprintf(), respectively, **except that they are called with a va_list instead of a variable number of arguments.**
-
-
+The  functions  vprintf()，  vfprintf()，  vdprintf()，  vsprintf()，  vsnprintf()  are  equivalent to the functions printf()， fprintf()， dprintf()， sprintf()， snprintf()， respectively， **except that they are called with a va_list instead of a variable number of arguments.**
 
 
 
 
 
+115. **差异性测试** Diff-test
+
+我们让在NEMU中执行的每条指令也在真机中执行一次，然后对比NEMU和真机的状态，如果NEMU和真机的状态不一致，我们就捕捉到error了。
+
+通常来说，进行DiffTest需要提供一个和DUT(Design Under Test，测试对象) 功能相同但实现方式不同的REF(Reference，参考实现)，然后让它们接受相同的有定义的输入，观测它们的行为是否相同。
+
+程序和计算机都可以看成是一个状态机， 状态可以表示成一个二元组`S = <R， M>`， 其中`R`是寄存器的值， `M`是内存的值。要检查指令的实现是否正确，只要检查执行指令之后DUT和REF的状态是否一致就可以了! DiffTest可以非常及时地捕捉到error，第一次发现NEMU的状态与真机不一样的时候，就是因为当前执行的指令实现有误导致的。
+
+我们不仅仅是对比程序运行的结果，而是对比每条指令的行为。这样可以帮助我们快速发现并定位指令实现的bug。
 
 
 
+Difftest的API：
+
+```c
+// 在DUT host memory的`buf`和REF guest memory的`addr`之间拷贝`n`字节,
+// `direction`指定拷贝的方向, `DIFFTEST_TO_DUT`表示往DUT拷贝, `DIFFTEST_TO_REF`表示往REF拷贝
+void difftest_memcpy(paddr_t addr, void *buf, size_t n, bool direction);
+// `direction`为`DIFFTEST_TO_DUT`时, 获取REF的寄存器状态到`dut`;
+// `direction`为`DIFFTEST_TO_REF`时, 设置REF的寄存器状态为`dut`;
+void difftest_regcpy(void *dut, bool direction);
+// 让REF执行`n`条指令
+void difftest_exec(uint64_t n);
+// 初始化REF的DiffTest功能
+void difftest_init();
+```
+
+DUT和REF分别是NEMU和其它模拟器。
+
+
+
+116. 又学到一个表情
+
+^ _ ^
+
+
+
+117. 启动diff-test 
+
+```shell
+Testing and Debugging
+  [*] Enable differential testing
+```
+
+
+
+118. **KVM、QEMU、Spike**
+
+```shell
+sudo apt-get install qemu-system
+sudo apt-get install device-tree-compiler
+```
+
+
+
+
+
+119. **理解 difftest 的过程？**
+
+（1）init_difftest
+
+进行了上述初始化工作之后, DUT和REF就处于相同的状态了
+
+（2）difftest_step
+
+可以进行逐条指令执行后的状态对比了
+
+（3）isa_difftest_checkregs
+
+然后读出REF中的寄存器，并进行对比
+
+把通用寄存器和PC与从DUT中读出的寄存器的值进行比较
+
+**若对比结果一致, 函数返回`true`。如果发现值不一样, 函数返回`false`。**
+
+
+
+
+
+120. **为什么difftest不对内存状态进行检测？**
+
+我们实现的DiffTest并不是完整地对比REF和NEMU的状态，但是不管是内存还是特殊寄存器，只要客户程序的一条指令修改了它们，在不久的将来肯定也会再次用到它们，到时候一样能检测出状态的不同。
+
+**我们其实牺牲了一些比较的精度，来换取性能的提升。**
+
+开启difftest会带来性能的损失！
+
+
+
+
+
+121. **不要同时运行两个NEMU进行diff-test！**
+
+
+
+
+
+122. **RISCV 不支持不对齐的地址访存**
+
+RISC-V作为一个RISC架构，通常是不支持不对齐访存的，在Spike中执行一条地址不对齐的访存指令将会抛出异常，让PC跳转到`0`。
+
+
+
+123. **使用 difftest_skip_ref 跳过某些指令的执行**
+
+
+
+
+
+124. **在相应指令集的 dut 中的 isa_difftest_checkregs中添加代码，完善diff-test**
+
+把通用寄存器和PC与从DUT中读出的寄存器的值进行比较。若对比结果一致，函数返回`true`。 如果发现值不一样，函数返回`false`。框架代码会自动停止客户程序的运行。
+
+特别地，`isa_difftest_checkregs()`对比结果不一致时，**第二个参数`pc`应指向导致对比结果不一致的指令，可用于打印提示信息。**
+
+
+
+
+
+
+
+
+
+125. 使用diff-test 需要安装依赖？
+
+```shell
+sudo apt install libboost-all-dev
+```
 
 
 
