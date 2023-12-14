@@ -2226,11 +2226,7 @@ RISC-V作为一个RISC架构，通常是不支持不对齐访存的，在Spike�
 
 
 
-
-
-
-
-125. 使用diff-test 需要安装依赖？
+125. **使用diff-test 需要安装依赖？**
 
 ```shell
 sudo apt install libboost-all-dev
