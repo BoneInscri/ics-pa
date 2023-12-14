@@ -37,16 +37,20 @@ void device_update() {
   static uint64_t last = 0;
   uint64_t now = get_time();
   if (now - last < 1000000 / TIMER_HZ) {
+    // 避免检查过于频繁, 因为上述事件发生的频率是很低的
     return;
   }
   last = now;
+  // 检查距离上次设备更新是否已经超过一定时间
 
   IFDEF(CONFIG_HAS_VGA, vga_update_screen());
+  // 尝试刷新屏幕
 
 #ifndef CONFIG_TARGET_AM
   SDL_Event event;
   while (SDL_PollEvent(&event)) {
     switch (event.type) {
+      // 检查是否有按键按下/释放
       case SDL_QUIT:
         nemu_state.state = NEMU_QUIT;
         break;
@@ -76,6 +80,7 @@ void sdl_clear_event_queue() {
 void init_device() {
   IFDEF(CONFIG_TARGET_AM, ioe_init());
   init_map();
+  // 调用init_map()进行初始化
 
   IFDEF(CONFIG_HAS_SERIAL, init_serial());
   IFDEF(CONFIG_HAS_TIMER, init_timer());

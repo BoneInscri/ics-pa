@@ -36,6 +36,7 @@ static void alarm_sig_handler(int signum) {
 }
 
 void init_alarm() {
+  // 进行定时器(alarm)相关的初始化工作
   struct sigaction s;
   memset(&s, 0, sizeof(s));
   s.sa_handler = alarm_sig_handler;

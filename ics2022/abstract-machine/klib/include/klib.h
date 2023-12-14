@@ -36,6 +36,7 @@ int    abs       (int x);
 int    atoi      (const char *nptr);
 
 // stdio.h
+int    vprintf(const char *fmt, va_list ap);
 int    printf    (const char *format, ...);
 int    sprintf   (char *str, const char *format, ...);
 int    snprintf  (char *str, size_t size, const char *format, ...);

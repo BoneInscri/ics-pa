@@ -130,6 +130,7 @@ static void execute(uint64_t n)
     }
     // printf("%d\n", nemu_state.state);
     IFDEF(CONFIG_DEVICE, device_update());
+    // cpu_exec()在执行每条指令之后就会调用device_update()函数
   }
 }
 

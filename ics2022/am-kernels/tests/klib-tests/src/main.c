@@ -18,7 +18,8 @@ static const char *tests[256] = {
     ['3'] = "strcpy_test",
     ['4'] = "strcat_test",
     ['5'] = "mem_test",
-    ['6'] = "sprintf_test"
+    ['6'] = "sprintf_test",
+    ['7'] = "printf_test"
 };
 
 int main(const char *args)
@@ -31,6 +32,7 @@ int main(const char *args)
     CASE('4', strcat_test);
     CASE('5', mem_test);
     CASE('6', sprintf_test);
+    CASE('7', printf_test);
   default:
     // printf("Usage: make run mainargs=*\n");
     for (int ch = 0; ch < 256; ch++)

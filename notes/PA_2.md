@@ -1756,14 +1756,6 @@ make ARCH=native run
 
 
 
-TODO ：
-
-1. 完成 klib 剩余函数 并编写测试！
-
-2. 添加differential test！
-
-
-
 84. **BIOS？**
 
 Basic Input/Output System
@@ -1855,9 +1847,13 @@ pmem_write()
 
 为了不让代码优化影响程序的行为。
 
+每一行代码都是又作用的，不能让编译器优化这些语句，特别是对设备进行操作。
+
 
 
 92. **添加了IOE的TRM状态机模型？**
+
+执行普通指令时，状态机按照TRM的模型进行状态转移
 
 设备的输入输出都是通过CPU的寄存器来进行数据交互的。
 
@@ -1867,11 +1863,27 @@ pmem_write()
 
 2）**输出**时TRM的状态不会发生变化，发生变化的只有设备。
 
+设备是连接计算机和物理世界的桥梁
+
+![image-20231214191429977](PA_2.assets/image-20231214191429977.png)
+
+<img src="PA_2.assets/image-20231214191550258.png" alt="image-20231214191550258" style="zoom: 50%;" />
+
+`in addr, r`，这条指令将会从设备地址`addr`中读入一个数据到CPU的寄存器`r`中
+
+输入输出对程序的影响也仅仅体现在**输入时会进行一次不能提前确定的状态转移**，这基本上就是程序眼中输入输出的全部.
+
+
+
 
 
 93. **DMA？**
 
 通过内存`M`来进行数据交互的输入输出方式。
+
+https://en.wikipedia.org/wiki/Direct_memory_access
+
+
 
 
 
@@ -2122,12 +2134,12 @@ The  functions  vprintf()，  vfprintf()，  vdprintf()，  vsprintf()，  vsnpr
 Difftest的API：
 
 ```c
-// 在DUT host memory的`buf`和REF guest memory的`addr`之间拷贝`n`字节,
-// `direction`指定拷贝的方向, `DIFFTEST_TO_DUT`表示往DUT拷贝, `DIFFTEST_TO_REF`表示往REF拷贝
-void difftest_memcpy(paddr_t addr, void *buf, size_t n, bool direction);
-// `direction`为`DIFFTEST_TO_DUT`时, 获取REF的寄存器状态到`dut`;
-// `direction`为`DIFFTEST_TO_REF`时, 设置REF的寄存器状态为`dut`;
-void difftest_regcpy(void *dut, bool direction);
+// 在DUT host memory的`buf`和REF guest memory的`addr`之间拷贝`n`字节，
+// `direction`指定拷贝的方向， `DIFFTEST_TO_DUT`表示往DUT拷贝， `DIFFTEST_TO_REF`表示往REF拷贝
+void difftest_memcpy(paddr_t addr， void *buf， size_t n， bool direction);
+// `direction`为`DIFFTEST_TO_DUT`时， 获取REF的寄存器状态到`dut`;
+// `direction`为`DIFFTEST_TO_REF`时， 设置REF的寄存器状态为`dut`;
+void difftest_regcpy(void *dut， bool direction);
 // 让REF执行`n`条指令
 void difftest_exec(uint64_t n);
 // 初始化REF的DiffTest功能
@@ -2168,7 +2180,7 @@ sudo apt-get install device-tree-compiler
 
 （1）init_difftest
 
-进行了上述初始化工作之后, DUT和REF就处于相同的状态了
+进行了上述初始化工作之后， DUT和REF就处于相同的状态了
 
 （2）difftest_step
 
@@ -2180,7 +2192,7 @@ sudo apt-get install device-tree-compiler
 
 把通用寄存器和PC与从DUT中读出的寄存器的值进行比较
 
-**若对比结果一致, 函数返回`true`。如果发现值不一样, 函数返回`false`。**
+**若对比结果一致， 函数返回`true`。如果发现值不一样， 函数返回`false`。**
 
 
 
@@ -2231,6 +2243,313 @@ RISC-V作为一个RISC架构，通常是不支持不对齐访存的，在Spike�
 ```shell
 sudo apt install libboost-all-dev
 ```
+
+
+
+
+
+126. **设备的本质就是一个数字逻辑电路**
+
+键盘控制器模块和VGA控制器模块
+
+
+
+
+
+127. **访问设备的例子**
+
+访问设备， 说白了就是从设备获取数据(输入)， 比如从键盘控制器获取按键扫描码， 或者是向设备发送数据(输出)， 比如向显存写入图像的颜色信息
+
+
+
+
+
+128. **理解设备，需要回答下面的问题。**
+
+- 具体要从哪里**读数据**? 
+- 把数据**写入到哪里**? 
+- 如何**查询/设置设备的状态**?
+- CPU和设备之间的**接口, 究竟是什么**?
+
+
+
+
+
+129. **CPU如何访问自己的寄存器？**
+
+1）对寄存器编号
+
+2）在指令中引用这些编号，电路上会有相应的选择器，来选择相应的寄存器并进行读写
+
+
+
+
+
+130. **x86 采用in 和 out 指令访问设备**
+
+- `in`指令用于将设备寄存器中的数据传输到**CPU寄存器**中
+- `out`指令用于将CPU寄存器中的数据传送到**设备寄存器**中
+
+
+
+131. **设备的抽象思想**
+
+设备向CPU暴露设备寄存器的接口，把设备内部的复杂行为(甚至一些模拟电路的特性)进行抽象，CPU只需要使用这一接口访问设备，就可以实现期望的功能。
+
+
+
+
+
+132. **端口映射I/O的缺陷是？**
+
+端口映射I/O把端口号作为I/O指令的一部分
+
+指令集为了兼容已经开发的程序，是只能添加但不能修改的
+
+1）不好修改
+
+2）很容易空间不够
+
+
+
+133. **为什么MMIO产生？**
+
+有的设备需要让CPU访问一段较大的连续存储空间，如VGA的显存
+
+24色加上Alpha通道的1024x768分辨率的显存就需要**3MB的编址范围**
+
+**这种编址方式将一部分物理内存的访问"重定向"到I/O地址空间中,** CPU尝试访问这部分物理内存的时候, 实际上最终是访问了相应的I/O设备
+
+（重点理解重定向）
+
+ **RISC架构只提供内存映射I/O的编址方式**
+
+
+
+134. **VGA的地址**
+
+```
+[0xa1000000, 0xa1800000)
+```
+
+可以通过下面的语句将3MB的显存空间全部设置为0
+
+```c
+memset((void *)0xa1000000, 0, SCR_SIZE);
+```
+
+即往整个屏幕写入黑色像素，作用相当于清屏
+
+
+
+
+
+134. **NEMU的设备**
+
+nemu/src/device
+
+- map.h
+- map.c
+- port-io.c
+
+
+
+- struct IOMap
+- map_read
+- map_write
+- add_pio_map
+- pio_read
+- pio_write
+- paddr_read
+- paddr_write
+- pmem_read
+- pmem_write
+
+
+
+内存和外设在CPU来看并没有什么不同，
+
+**只不过都是一个字节编址的对象而已。**
+
+```
+paddr_read
+	-> pmem_read
+	-> map_read
+paddr_write
+	-> pmem_write
+	-> map_write
+```
+
+
+
+```c
+word_t paddr_read(paddr_t addr, int len) {
+    if (likely(in_pmem(addr))) return pmem_read(addr, len);
+    IFDEF(CONFIG_DEVICE, return mmio_read(addr, len));
+    out_of_bound(addr);
+    return 0;
+}
+
+void paddr_write(paddr_t addr, int len, word_t data) {
+    if (likely(in_pmem(addr))) { pmem_write(addr, len, data); return; }
+    IFDEF(CONFIG_DEVICE, mmio_write(addr, len, data); return);
+    out_of_bound(addr);
+}
+```
+
+
+
+```c
+word_t mmio_read(paddr_t addr, int len) {
+  return map_read(addr, len, fetch_mmio_map(addr));
+}
+
+void mmio_write(paddr_t addr, int len, word_t data) {
+  map_write(addr, len, data, fetch_mmio_map(addr));
+}
+```
+
+
+
+135. **开启设备**
+
+```shell
+make menuconfig
+```
+
+```
+[*] Devices  --->
+```
+
+
+
+
+
+136. **SDL进行设备的模拟**
+
+1）init_device
+
+2）init_map
+
+3）device_update
+
+
+
+
+
+137. **设备的抽象寄存器**
+
+amdev.h
+
+这些定义是架构无关的
+
+
+
+- io_read -> ioe_read
+- io_write-> ioe_write
+
+NEMU作为一个平台，设备的行为是与ISA无关的
+
+ioe.c
+
+处理函数的具体功能和寄存器编号相关
+
+
+
+
+
+138. **串口详细分析**
+
+serial.c
+
+- 0x3F8 ，8字节 端口
+- 0xa00003F8，8字节 MMIO 空间
+
+```c
+#define CONFIG_SERIAL_MMIO 0xa00003f8
+#define COM1 0x3f8
+```
+
+ 每当CPU往数据寄存器中写入数据时，串口会将数据传送到主机的标准错误流进行输出.
+
+可计算理论中提出的最原始的TRM并不包含输出的能力
+
+**AM却把`putch()`放在TRM，而不是IOE**
+
+TRM + putch -> 扩充版的TRM，**更加接近一个实用且真实的计算机模型**
+
+==输出是一个最基本的功能，没有输出，用户甚至无法知道程序具体在做什么==
+
+
+
+测试串口：
+
+ 在`am-kernels/kernels/hello/`目录下键入
+
+```shell
+make ARCH=riscv64-nemu run
+```
+
+
+
+理解这里的输出和一般的hello world的不同？
+
+一般的hello world的输出是通过操作系统完成的，**这里的hello程序可以直接运行在bare mental 裸机上的！**
+
+![image-20231214200154141](PA_2.assets/image-20231214200154141.png)
+
+
+
+由于NEMU中设备的行为是我们自定义的，**与REF中的标准设备的行为不完全一样**
+
+使用difftest_skip_ref 跳过 访问设备的检查！
+
+```c
+static inline int find_mapid_by_addr(IOMap *maps, int size, paddr_t addr) {
+    int i;
+    for (i = 0; i < size; i ++) {
+        if (map_inside(maps + i, addr)) {
+            difftest_skip_ref();
+            return i;
+        }
+    }
+    return -1;
+}
+```
+
+
+
+139. **给hello程序带上参数**
+
+```shell
+make ARCH=riscv64-nemu run mainargs=I-love-PA
+```
+
+思考mainargs如何传递到hello程序中的？
+
+CFLAGS += -DMAINARGS=\"$(mainargs)\"
+
+
+
+
+
+140. **实现 printf**
+
+和sprintf实现十分类似！但是我们需要通过putch完成串口输出，但是最好不要copy-paste
+
+实现了`printf()`之后, 你就可以在AM程序中使用输出调试法了
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
