@@ -87,13 +87,11 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc)
 
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 
-  // #ifdef CONFIG_CC_WATCHPOINT
-  int ret = trace_watchpoint();
-  if (ret)
-  {
+#ifdef CONFIG_WATCHPOINT
+  if(trace_watchpoint()) {
     nemu_state.state = NEMU_STOP;
   }
-  // #endif
+#endif
 }
 
 //  取指, 译码, 执行, 更新PC
@@ -177,6 +175,7 @@ void itrace_print()
 void cpu_exec(uint64_t n)
 {
   g_print_step = (n < MAX_INST_TO_PRINT);
+  // g_print_step = true;
   switch (nemu_state.state)
   {
   case NEMU_END:

@@ -19,9 +19,6 @@
 #include <isa.h>
 
 
-// IFDEF(CONFIG_ITRACE, char logbuf[ITRACE_SIZE][128];)
-// IFDEF(CONFIG_ITRACE, int itrace_p;)
-
 typedef struct Decode {
   vaddr_t pc;
   vaddr_t snpc; // static next pc

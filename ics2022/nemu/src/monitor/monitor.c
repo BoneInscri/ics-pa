@@ -77,7 +77,9 @@ static int parse_args(int argc, char *argv[]) {
     {"diff"     , required_argument, NULL, 'd'},
     {"port"     , required_argument, NULL, 'p'},
     {"help"     , no_argument      , NULL, 'h'},
+#ifdef CONFIG_FTRACE
     {"ftrace"   , required_argument, NULL, 'f'},
+#endif
     {0          , 0                , NULL,  0 },
   };
   int o;
@@ -95,7 +97,9 @@ static int parse_args(int argc, char *argv[]) {
         printf("\t-l,--log=FILE           output log to FILE\n");
         printf("\t-d,--diff=REF_SO        run DiffTest with reference REF_SO\n");
         printf("\t-p,--port=PORT          run DiffTest with port PORT\n");
+#ifdef CONFIG_FTRACE
         printf("\t-f,--ftrace=FILE        analyse the function call of FILE(elf format)\n");
+#endif
         printf("\n");
         exit(0);
     }
@@ -119,8 +123,9 @@ void init_monitor(int argc, char *argv[]) {
   init_mem();
 
   /* Open the elf file*/
+#ifdef CONFIG_FTRACE
   init_ftrace(ftrace_file); 
-
+#endif
   /* Initialize devices. */
   IFDEF(CONFIG_DEVICE, init_device());
 

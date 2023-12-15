@@ -8,7 +8,7 @@ uint8_t Mag_num[] = {ELFMAG0, ELFMAG1, ELFMAG2, ELFMAG3};
 #define phdr_table_max 40
 #define sym_table_max 1000
 #define str_table_max 5000
-#define shstr_table_max 200
+#define shstr_table_max 500
 
 Elf64_Shdr shdr_table[shdr_table_max];
 Elf64_Phdr phdr_table[phdr_table_max];
@@ -165,6 +165,7 @@ __attribute__((used)) static void Elf64_Ehdr_parse(ELF_helper *elf_helper)
     elf_helper->e_shstrndx = ehdr.e_shstrndx;
 }
 
+__attribute__((used))
 void init_ftrace(const char *elf_file)
 {
     elf_fp = stdin;
@@ -216,6 +217,7 @@ static int section_pc2func_idx(vaddr_t pc)
     return -1;
 }
 
+__attribute__((used))
 void Call_print(vaddr_t caller_pc, vaddr_t callee_pc)
 {
     int caller_idx = section_pc2func_idx(caller_pc);
@@ -242,6 +244,7 @@ void Call_print(vaddr_t caller_pc, vaddr_t callee_pc)
         log_write("call(%s) [%s@%lx]\n", &str_table[funcs[caller_idx].st_name], &str_table[funcs[callee_idx].st_name], callee_pc);
 }
 
+__attribute__((used))
 void Ret_print(vaddr_t ret_from_pc, vaddr_t ret_to_pc)
 {
     int ret_from_idx = section_pc2func_idx(ret_from_pc);

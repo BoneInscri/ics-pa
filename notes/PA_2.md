@@ -2632,6 +2632,162 @@ am-kernel/benchmarks/
 
 
 
+142. **运行dhrystone 需要添加的指令**
+
+```c
+00 17 27 13 slti    a4, a4, 1
+```
+
+![image-20231215120702202](PA_2.assets/image-20231215120702202.png)
+
+![image-20231215120713383](PA_2.assets/image-20231215120713383.png)
+
+SLTI (set less than immediate) places the value 1 in register rd **if register rs1 is less than the sign-extended immediate** when **both are treated as signed numbers**, else 0 is written to rd.
+
+
+
+dhrystone 运行的次数：
+
+```c
+#define NUMBER_OF_RUNS		500000
+```
+
+
+
+
+
+143. **运行 coremark 需要添加的指令**
+
+```c
+02 c6 d5 3b divuw   a0, a3, a2
+```
+
+![image-20231215121415053](PA_2.assets/image-20231215121415053.png)
+
+![image-20231215121427464](PA_2.assets/image-20231215121427464.png)
+
+DIVW and DIVUW are RV64 instructions that divide the **lower 32 bits** of rs1 by the **lower 32 bits** of rs2, treating them as **signed** and **unsigned** integers respectively, **placing the 32-bit quotient in rd, sign-extended to 64 bits**.
+
+
+
+```c
+00 17 87 83 lb      a5, 1(a5)
+```
+
+![image-20231215122659936](PA_2.assets/image-20231215122659936.png)
+
+![image-20231215120713383](PA_2.assets/image-20231215120713383.png)
+
+LB and LBU are defined analogously for 8-bit values. 
+
+
+
+
+
+```c
+ori     s0, s0, 128
+```
+
+![image-20231215123156236](PA_2.assets/image-20231215123156236.png)
+
+![image-20231215120713383](PA_2.assets/image-20231215120713383.png)
+
+ANDI, ORI, XORI are **logical operations** that perform bitwise AND, **OR**, and XOR on register rs1 and **the sign-extended 12-bit immediate** and place the result in rd.
+
+
+
+
+
+144. **运行 microbench**
+
+```shell
+make ARCH=native run mainargs=huge
+make ARCH=native run mainargs=ref
+make ARCH=native run mainargs=train
+make ARCH=native run mainargs=test
+
+make ARCH=riscv64-nemu run mainargs=huge
+make ARCH=riscv64-nemu run mainargs=ref
+make ARCH=riscv64-nemu run mainargs=train
+make ARCH=riscv64-nemu run mainargs=test
+```
+
+
+
+需要添加的指令
+
+```c
+03 25 75 3b remuw   a0, a0, s2
+```
+
+![image-20231215131126757](PA_2.assets/image-20231215131126757.png)
+
+![image-20231215131142972](PA_2.assets/image-20231215131142972.png)
+
+REMW and REMUW are RV64 instructions that provide the corresponding signed and **unsigned** remainder operations respectively. **Both REMW and REMUW always sign-extend the 32-bit result to 64 bits, including on a divide by zero.**
+
+
+
+```c
+00 f3 17 b3 sll     a5, t1, a5
+```
+
+![image-20231215131730895](PA_2.assets/image-20231215131730895.png)
+
+![image-20231215131142972](PA_2.assets/image-20231215131142972.png)
+
+**SLL**, SRL, and SRA perform **logical left**, logical right, and arithmetic right shifts on the value in **register rs1 by the shift amount held in the lower 5 bits of register rs2.**
+
+
+
+```
+02 e4 77 b3 remu    a5, s0, a4
+```
+
+![image-20231215132156068](PA_2.assets/image-20231215132156068.png)
+
+![image-20231215131142972](PA_2.assets/image-20231215131142972.png)
+
+REM and REMU provide the remainder of the corresponding division operation. **For REM, the sign of the result equals the sign of the dividend.**
+
+
+
+
+
+145. BrainF**k 语言
+
+简单的一个语言解释器和看上去很复杂的NEMU从原理上来看还是有相似之处
+
+
+
+146. itrace 一定要打开！
+
+
+
+
+
+147. 出现 Floating point exception 报错？？
+
+有除以0 和 对 0取余的行为？
+
+
+
+
+
+150. **microbench  ref**
+
+<img src="PA_2.assets/image-20231215153946355.png" alt="image-20231215153946355" style="zoom:67%;" />
+
+测试结果
+
+
+
+
+
+
+
+
+
 
 
 
