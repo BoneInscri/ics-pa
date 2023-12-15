@@ -6,8 +6,8 @@ uint8_t Mag_num[] = {ELFMAG0, ELFMAG1, ELFMAG2, ELFMAG3};
 
 #define shdr_table_max 40
 #define phdr_table_max 40
-#define sym_table_max 200
-#define str_table_max 1000
+#define sym_table_max 1000
+#define str_table_max 5000
 #define shstr_table_max 200
 
 Elf64_Shdr shdr_table[shdr_table_max];

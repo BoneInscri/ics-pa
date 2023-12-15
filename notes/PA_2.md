@@ -2545,6 +2545,95 @@ CFLAGS += -DMAINARGS=\"$(mainargs)\"
 
 
 
+141. **实现时钟**
+
+例如游戏的帧率 程序的快慢 都需要时钟
+
+timer.c
+
+amdev.h
+
+- 0x48 处端口 8个字节
+- 0xa0000048 处MMIO 8字节空间
+
+```c
+#define CONFIG_RTC_MMIO 0xa0000048
+```
+
+AM_TIMER_RTC  (RTC, Real Time Clock)  当前的年月日时分秒
+
+**AM_TIMER_UPTIME  系统启动时间 系统启动后的微秒数.**
+
+ 
+
+**参考 nemu.h 和 riscv64.h 完成 AM_TIMER_UPTIME**
+
+
+
+测试：
+
+```c
+am-kernel/tests/am-tests
+```
+
+real-time clock test ????
+
+在哪里？
+
+![image-20231215111150589](PA_2.assets/image-20231215111150589.png)
+
+
+
+```shell
+make ARCH=riscv64-nemu run mainargs=t
+```
+
+居然出现了没有实现的指令
+
+
+
+divu
+
+```c
+0297d7b3          	divu	a5,a5,s1
+```
+
+![image-20231215111511739](PA_2.assets/image-20231215111511739.png)
+
+![image-20231215111552303](PA_2.assets/image-20231215111552303.png)
+
+DIV and DIVU perform an XLEN bits by XLEN bits **signed and unsigned** integer division of rs1 by rs2, rounding towards zero.
+
+
+
+可以参考spike timer的实现！
+
+这里应该是低地址在高字节，高地址在低字节。
+
+
+
+测试程序运行速度！
+
+am-kernel/benchmarks/
+
+测试bench的时候需要关闭watchpoint、trace和difftest还有Enable debug information
+
+
+
+运行下面三个bench测试
+
+- dhrystone
+- coremark
+- microbench ： test`, `train`, `ref`和`huge
+
+`huge`规模一般用于真机的测试
+
+
+
+
+
+
+
 
 
 
