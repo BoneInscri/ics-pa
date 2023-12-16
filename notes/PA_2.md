@@ -2786,6 +2786,120 @@ REM and REMU provide the remainder of the corresponding division operation. **Fo
 
 
 
+151. **运行红白机模拟器**
+
+在NEMU上运行一个字符版本的FCEUX。
+
+修改`fceux-am/src/config.h`中的代码，把**`HAS_GUI`**宏注释掉，FCEUX就会通过`putch()`来输出画面。
+
+
+
+```shell
+make ARCH=riscv64-nemu run mainargs=contra
+```
+
+
+
+
+
+152. **实现malloc和free的简单版本**
+
+可以参考 microbench     bench_alloc 和 bench_free
+
+
+
+free 可以不写，即只分配不释放
+
+
+
+
+
+153. **运行 红白机模拟器 需要添加的指令**
+
+```shell
+00 0a e6 03 lwu     a2, 0(s5)
+```
+
+![image-20231215193424936](PA_2.assets/image-20231215193424936.png)
+
+![image-20231215193448763](PA_2.assets/image-20231215193448763.png)
+
+The LW instruction **loads a 32-bit value** from memory and **sign-extends** this to 64 bits before storing it in register rd for RV64. The LWU instruction, on the other hand, **zero-extends the 32-bit** value from memory for RV64.
+
+
+
+
+
+154. **出现问题了，用diff-test 工具进行检测。**
+
+重点需要关注的指令：
+
+```c
+43 f7 57 13 srai    a4, a4, 63
+```
+
+![image-20231215201822554](PA_2.assets/image-20231215201822554.png)
+
+![image-20231215201938464](PA_2.assets/image-20231215201938464.png)
+
+![image-20231215201949265](PA_2.assets/image-20231215201949265.png)
+
+
+
+SLLI is a logical left shift (zeros are shifted into the lower bits); 
+
+SRLI is a logical right shift (zeros are shifted into the upper bits); 
+
+SRAI is an arithmetic right shift (the original sign bit is copied into the vacated upper bits).
+
+
+
+
+
+155. **litenes 需要添加的指令**
+
+```c
+00f75733          	srl	a4,a4,a5
+```
+
+![image-20231215223803898](PA_2.assets/image-20231215223803898.png)
+
+![image-20231215223827272](PA_2.assets/image-20231215223827272.png)
+
+SLL, **SRL**, and SRA perform logical left, **logical right**, and arithmetic right shifts on the value in register rs1 by the shift amount held in the lower 5 bits of register rs2.
+
+
+
+```c
+02854433          	div	s0,a0,s0
+```
+
+![image-20231215224025623](PA_2.assets/image-20231215224025623.png)
+
+![image-20231215223827272](PA_2.assets/image-20231215223827272.png)
+
+DIV and DIVU perform an XLEN bits by XLEN bits **signed** and **unsigned** integer division of rs1 by rs2, rounding towards zero.
+
+
+
+
+
+156. **重点需要关注的指令**
+
+remw
+
+divw
+
+ld
+
+addi
+
+
+
+
+
+
+
 
 
 
