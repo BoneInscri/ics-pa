@@ -35,8 +35,8 @@
 
 static int s_srendline;
 // static int s_erendline;
-// static const int s_tlines = 240;
-static const int s_tlines = 120;
+static const int s_tlines = 240;
+// static const int s_tlines = 120;
 static int s_inited;
 
 #define s_clipSides 0
@@ -137,8 +137,8 @@ void BlitScreen(uint8 *XBuf)
 	int y = (io_read(AM_GPU_CONFIG).height - 240) / 2;
 	io_write(AM_GPU_FBDRAW, x, y, canvas, scrw, s_tlines, true);
 #else
-	printf("\n");
-	// printf("\033[0;0H");
+	// printf("\n");
+	printf("\033[0;0H");
 	for (int y = 0; y < s_tlines; y += 4)
 	{
 		// draw_rect(&screen[y][8], xpad, ypad + y, W, 1);
@@ -151,6 +151,5 @@ void BlitScreen(uint8 *XBuf)
 		}
 		putch('\n');
 	}
-	printf("\n");
 #endif
 }
