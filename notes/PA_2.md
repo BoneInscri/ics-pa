@@ -2948,21 +2948,76 @@ mainargs = h、H、i、d、m、t、k、v、a、p
 
 
 
-158. 图像不显示，可能是memmove 库函数实现有问题！
+158. **图像不显示，可能是memmove 库函数实现有问题！**
 
 
 
 
 
-159. 记录设备访问的踪迹 dtrace
+159. **记录设备访问的踪迹 dtrace**
 
-在map_read 和 map_write 中加
-
-
+在map_read 和 map_write 中加 一个输出即可
 
 
 
 
+
+160. **键盘**
+
+nemu/src/device/keyboard.c
+
+abstract-machine/am/include/amdev.h
+
+`0x60`处长度为4个字节的端口
+
+`0xa0000060`处长度为4字节的MMIO空间
+
+- 当按下一个键的时候, 键盘将会发送该键的**通码**(make code)
+- 当释放一个键的时候, 键盘将会发送该键的**断码**(break code)
+
+没有按键就返回 **AM_KEY_NONE**
+
+
+
+**实现 AM_INPUT_KEYBRD 的功能**
+
+**abstract-machine/am/src/platform/nemu/ioe/input.c**
+
+
+
+然后通过 测试
+
+readkey test
+
+```c
+make ARCH=riscv64-nemu run mainargs=k
+```
+
+按键名，键盘码，以及按键状态
+
+注意，可以使用
+
+```c
+static inline uint8_t  inb(uintptr_t addr) { return *(volatile uint8_t  *)addr; }
+static inline uint16_t inw(uintptr_t addr) { return *(volatile uint16_t *)addr; }
+static inline uint32_t inl(uintptr_t addr) { return *(volatile uint32_t *)addr; }
+```
+
+来读取外设的字节位置
+
+
+
+**记得需要将黑色的显示框放在最上面！**
+
+
+
+
+
+**161. 检测多个按键同时被按下？**
+
+给每一个按键都进行MMIO！
+
+RPG游戏中的八方向行走，格斗游戏中的组合招式等等
 
 
 
