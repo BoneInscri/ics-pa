@@ -2948,11 +2948,16 @@ mainargs = h、H、i、d、m、t、k、v、a、p
 
 
 
-
-
-
-
 158. 图像不显示，可能是memmove 库函数实现有问题！
+
+
+
+
+
+159. 记录设备访问的踪迹 dtrace
+
+在map_read 和 map_write 中加
+
 
 
 

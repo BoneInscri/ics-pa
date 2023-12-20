@@ -37,12 +37,14 @@
 #define CONFIG_RECURSIVE_TEST_COND "true"
 #define CONFIG_RT_CHECK 1
 #define CONFIG_ISA64 1
+#define CONFIG_DTRACE 1
 #define CONFIG_I8042_DATA_MMIO 0xa0000060
 #define CONFIG_ITRACE_COND "true"
 #define CONFIG_PMEM_MALLOC 1
 #define CONFIG_SB_SIZE 0x10000
 #define CONFIG_CC "gcc"
 #define CONFIG_DIFFTEST_REF_PATH "tools/spike-diff"
+#define CONFIG_DTRACE_COND "true"
 #define CONFIG_TRACE_START 0
 #define CONFIG_DISK_IMG_PATH ""
 #define CONFIG_CC_GCC 1
