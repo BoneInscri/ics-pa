@@ -2900,6 +2900,56 @@ addi
 
 
 
+157. **可以测试的文件**
+
+（1）am-kernels/kernels/demo/
+
+mainargs = 1~8
+
+
+
+（2）am-kernels/kernels/hello
+
+
+
+（3）am-kernels/kernels/litenes
+
+
+
+（4）am-kernels/kernels/slider
+
+
+
+（5）am-kernels/kernels/snake
+
+
+
+（6）am-kernels/kernels/thread-os
+
+```c
+80000380:	30571073          	csrw	mtvec,a4
+```
+
+
+
+（7）am-kernels/kernels/typing-game
+
+
+
+（8）am-kernels/kernels/yield-os
+
+
+
+**（9）am-kernels/tests/am-tests**
+
+mainargs = h、H、i、d、m、t、k、v、a、p
+
+
+
+
+
+
+
 
 
 

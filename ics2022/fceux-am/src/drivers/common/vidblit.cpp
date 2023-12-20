@@ -28,60 +28,59 @@ extern u8 *XDBuf;
 extern pal *palo;
 
 static uint32 CBM[3];
-static uint32 *palettetranslate=0;
-static int Bpp;	// BYTES per pixel
+static uint32 *palettetranslate = 0;
+static int Bpp; // BYTES per pixel
 
-bool   paldeemphswap   = 0;
+bool paldeemphswap = 0;
 
 static void CalculateShift(uint32 *CBM, int *cshiftr, int *cshiftl)
 {
-	int a,x,z;
-	cshiftl[0]=cshiftl[1]=cshiftl[2]=-1;
-	for(a=0;a<3;a++)
+	int a, x, z;
+	cshiftl[0] = cshiftl[1] = cshiftl[2] = -1;
+	for (a = 0; a < 3; a++)
 	{
-		for(x=0,z=0;x<32;x++)
+		for (x = 0, z = 0; x < 32; x++)
 		{
-			if(CBM[a]&(1<<x))
+			if (CBM[a] & (1 << x))
 			{
-				if(cshiftl[a]==-1) cshiftl[a]=x;
+				if (cshiftl[a] == -1)
+					cshiftl[a] = x;
 				z++;
 			}
 		}
-		cshiftr[a]=(8-z);
+		cshiftr[a] = (8 - z);
 	}
 }
 
 int InitBlitToHigh(int b, uint32 rmask, uint32 gmask, uint32 bmask, int efx, int specfilt, int specfilteropt)
 {
-  assert(b == 4);
+	assert(b == 4);
 
-	Bpp=b;
+	Bpp = b;
 
-	if(Bpp<=1 || Bpp>4)
-		return(0);
+	if (Bpp <= 1 || Bpp > 4)
+		return (0);
 
-	//allocate adequate room for 32bpp palette
-	palettetranslate=(uint32*)FCEU_dmalloc(256*4 + 512*4);
+	// allocate adequate room for 32bpp palette
+	palettetranslate = (uint32 *)FCEU_dmalloc(256 * 4 + 512 * 4);
 
-	if(!palettetranslate)
-		return(0);
+	if (!palettetranslate)
+		return (0);
 
-
-	CBM[0]=rmask;
-	CBM[1]=gmask;
-	CBM[2]=bmask;
-	return(1);
+	CBM[0] = rmask;
+	CBM[1] = gmask;
+	CBM[2] = bmask;
+	return (1);
 }
 
 void KillBlitToHigh(void)
 {
-	if(palettetranslate)
+	if (palettetranslate)
 	{
 		free(palettetranslate);
-		palettetranslate=NULL;
+		palettetranslate = NULL;
 	}
 }
-
 
 void SetPaletteBlitToHigh(uint8 *src)
 {
@@ -90,73 +89,83 @@ void SetPaletteBlitToHigh(uint8 *src)
 
 	CalculateShift(CBM, cshiftr, cshiftl);
 
-  assert(Bpp == 4);
-		for(int x=0;x<256;x++)
-		{
-			uint32 r=src[x<<2];
-			uint32 g=src[(x<<2)+1];
-			uint32 b=src[(x<<2)+2];
-			palettetranslate[x]=(r<<cshiftl[0])|(g<<cshiftl[1])|(b<<cshiftl[2]);
-		}
+	assert(Bpp == 4);
+	for (int x = 0; x < 256; x++)
+	{
+		uint32 r = src[x << 2];
+		uint32 g = src[(x << 2) + 1];
+		uint32 b = src[(x << 2) + 2];
+		palettetranslate[x] = (r << cshiftl[0]) | (g << cshiftl[1]) | (b << cshiftl[2]);
+	}
 
-		//full size deemph palette
-		if(palo)
+	// full size deemph palette
+	if (palo)
+	{
+		for (int x = 0; x < 512; x++)
 		{
-			for(int x=0;x<512;x++)
-			{
-				uint32 r=palo[x].r;
-				uint32 g=palo[x].g;
-				uint32 b=palo[x].b;
-				palettetranslate[256+x]=(r<<cshiftl[0])|(g<<cshiftl[1])|(b<<cshiftl[2]);
-			}
+			uint32 r = palo[x].r;
+			uint32 g = palo[x].g;
+			uint32 b = palo[x].b;
+			palettetranslate[256 + x] = (r << cshiftl[0]) | (g << cshiftl[1]) | (b << cshiftl[2]);
 		}
+	}
 }
 
-//takes a pointer to XBuf and applies fully modern deemph palettizing
-u32 ModernDeemphColorMap(u8* src, u8* srcbuf, int xscale, int yscale)
+// takes a pointer to XBuf and applies fully modern deemph palettizing
+u32 ModernDeemphColorMap(u8 *src, u8 *srcbuf, int xscale, int yscale)
 {
 	u8 pixel = *src;
 
-	//look up the legacy translation
+	// look up the legacy translation
 	u32 color = palettetranslate[pixel];
 
-	int ofs = src-srcbuf;
-	int xofs = ofs&255;
-	int yofs = ofs>>8;
-	if(xscale!=1) xofs /= xscale; //untested optimization
-	if(yscale!=1) yofs /= yscale; //untested optimization
-	ofs = xofs+yofs*256;
+	int ofs = src - srcbuf;
+	int xofs = ofs & 255;
+	int yofs = ofs >> 8;
+	if (xscale != 1)
+		xofs /= xscale; // untested optimization
+	if (yscale != 1)
+		yofs /= yscale; // untested optimization
+	ofs = xofs + yofs * 256;
 
-	//find out which deemph bitplane value we're on
+	// find out which deemph bitplane value we're on
 	uint8 deemph = XDBuf[ofs];
 
-	//if it was a deemph'd value, grab it from the deemph palette
-	if(deemph != 0)
-		color = palettetranslate[256+(pixel&0x3F)+deemph*64];
+	// if it was a deemph'd value, grab it from the deemph palette
+	if (deemph != 0)
+		color = palettetranslate[256 + (pixel & 0x3F) + deemph * 64];
 
 	return color;
 }
 
 void Blit8ToHigh(uint8 *src, uint8 *dest, int xr, int yr, int pitch, int xscale, int yscale)
 {
-	int x,y;
+	int x, y;
 
-  assert(Bpp == 4);
-  uint32 * dest32 = (uint32 *)dest;
-  int pinc=pitch-(xr<<2);
-  assert(xr % 8 == 0);
-  assert(pinc % 4 == 0);
-  for(y=yr;y;y--,src+=256-xr) {
-    for(x=xr;x;x-=8) {
-      //THE MAIN BLITTING CODEPATH (there may be others that are important)
-      //*(uint32 *)dest = ModernDeemphColorMap(src,XBuf,1,1);
+	assert(Bpp == 4);
+	uint32 *dest32 = (uint32 *)dest;
+	int pinc = pitch - (xr << 2);
+	assert(xr % 8 == 0);
+	assert(pinc % 4 == 0);
+	for (y = yr; y; y--, src += 256 - xr)
+	{
+		for (x = xr; x; x -= 8)
+		{
+			// THE MAIN BLITTING CODEPATH (there may be others that are important)
+			//*(uint32 *)dest = ModernDeemphColorMap(src,XBuf,1,1);
 
-      //look up the legacy translation,
-      //do not support deemph palette to optimize performance
-#define macro() *dest32 ++ = palettetranslate[*src ++]
-      macro(); macro(); macro(); macro();
-      macro(); macro(); macro(); macro();
-    }
-    dest32+=(pinc / 4);
-  }
+			// look up the legacy translation,
+			// do not support deemph palette to optimize performance
+#define macro() *dest32++ = palettetranslate[*src++]
+			macro();
+			macro();
+			macro();
+			macro();
+			macro();
+			macro();
+			macro();
+			macro();
+		}
+		dest32 += (pinc / 4);
+	}
 }

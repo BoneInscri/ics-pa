@@ -20,12 +20,13 @@ void am_init_monitor();
 void engine_start();
 int is_exit_status_bad();
 
-// int main(int argc, char *argv[]) {
-//   init_monitor(argc, argv);
-//   engine_start();
-//   return 0;
-// }
-
+#ifdef CONFIG_RECURSIVE_TEST
+int main(int argc, char *argv[]) {
+  init_monitor(argc, argv);
+  engine_start();
+  return 0;
+}
+#else
 int main(int argc, char *argv[]) {
   /* Initialize the monitor. */
 #ifdef CONFIG_TARGET_AM
@@ -39,3 +40,4 @@ int main(int argc, char *argv[]) {
   // return is_exit_status_bad();
   return 0;
 }
+#endif

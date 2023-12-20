@@ -190,6 +190,17 @@ config WATCHPOINT_COND
   string "Only watchpoint when the condition is true"
   default "true"
 
+config RECURSIVE_TEST
+  depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER
+  bool "Enable recursive test"
+  default y
+
+config RECURSIVE_TEST_COND
+  depends on RECURSIVE_TEST
+  string "Only recursive test when the condition is true"
+  default "true"
+
+
 
 config DIFFTEST
   depends on TARGET_NATIVE_ELF

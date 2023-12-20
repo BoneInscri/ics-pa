@@ -18,11 +18,30 @@
 #include "../local-include/reg.h"
 
 extern CPU_state cpu;
+extern const char *regs[];
 #define N_REGS 32
 
-bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
+static void regs_diff_display(CPU_state *ref_r, vaddr_t pc) {
+  if(ref_r->pc!= cpu.pc) {
+    printf("nemu : pc             0x%lx   %ld\n", cpu.pc, cpu.pc);
+    printf("ref  : pc             0x%lx   %ld\n", ref_r->pc, ref_r->pc);
+  }
   for (int i = 0; i < N_REGS; i++) {
     if(gpr(i) != ref_r->gpr[i]) {
+      printf("nemu : %-15s0x%lx   %ld\n", regs[i], gpr(i), gpr(i));
+      printf("ref  : %-15s0x%lx   %ld\n", regs[i], ref_r->gpr[i], ref_r->gpr[i]);
+    }
+  }
+}
+
+bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
+  if(ref_r->pc!= cpu.pc) {
+    return false;
+  }
+  for (int i = 0; i < N_REGS; i++) {
+    if(gpr(i) != ref_r->gpr[i]) {
+
+      regs_diff_display(ref_r, pc);
       return false;
     }
   }

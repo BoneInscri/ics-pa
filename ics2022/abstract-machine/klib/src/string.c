@@ -22,7 +22,7 @@ int strcmp(const char *s1, const char *s2)
     s1++;
     s2++;
   }
-  int ret = *s1 - *s2;
+  int ret = (uint8_t)*s1 - (uint8_t)*s2;
   if (ret == 0)
     return 0;
   else if (ret > 0)
@@ -50,11 +50,11 @@ int strncmp(const char *s1, const char *s2, size_t n)
   int ret = 0;
   if (!n)
   {
-    ret = *(s1 - 1) - *(s2 - 1);
+    ret = (uint8_t)*(s1 - 1) - (uint8_t)*(s2 - 1);
   }
   else
   {
-    ret = *s1 - *s2;
+    ret = (uint8_t)*s1 - (uint8_t)*s2;
   }
 
   if (ret == 0)

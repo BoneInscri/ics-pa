@@ -2165,7 +2165,7 @@ int FCEUX_PPU_Loop(int skip) {
 									pixelcolor = READPAL(0x10 + spixel);
 							}
 						}
-
+						printf("====%c====\n", *(ptr-1));
 						*ptr++ = PaletteAdjustPixel(pixelcolor);
 						*dptr++= PPU[1]>>5; //grab deemph
 					}

@@ -43,11 +43,14 @@ void *malloc(size_t size) {
   }
   size  = (size_t)ROUNDUP(size, 8);
   char *old = klib_hbrk;
+
   klib_hbrk += size;
   // assert((uintptr_t)heap.start <= (uintptr_t)klib_hbrk && (uintptr_t)klib_hbrk < (uintptr_t)heap.end);
-  // for (uint64_t *p = (uint64_t *)old; p != (uint64_t *)klib_hbrk; p ++) {
-  //   *p = 0; 
-  // }
+  for (uint64_t *p = (uint64_t *)old; p != (uint64_t *)klib_hbrk; p ++) {
+    *p = 0; 
+  }
+  // printf("heap_start %p \n", heap.start);
+  // printf("old %p size %x\n", old, size);
   // assert((uintptr_t)klib_hbrk - (uintptr_t)heap.start <= setting->mlim);
   return (void*)old;
 #endif

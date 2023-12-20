@@ -17,10 +17,12 @@
 
 void sdb_mainloop();
 
-// void engine_start() {
-//   cpu_exec(-1);
-// }
+#ifdef CONFIG_RECURSIVE_TEST
+void engine_start() {
+  cpu_exec(-1);
+}
 
+#else
 void engine_start() {
 #ifdef CONFIG_TARGET_AM
 // #ifdef CONFIG_RUN_DIRECTLY_COND
@@ -31,4 +33,4 @@ void engine_start() {
   sdb_mainloop();
 #endif
 }
-
+#endif

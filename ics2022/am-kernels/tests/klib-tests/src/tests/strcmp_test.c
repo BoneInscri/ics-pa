@@ -11,6 +11,7 @@ void strcmp_test()
     check(strcmp("abcd", "abce") < 0); /* Honest miscompares. */
     check(strcmp("abce", "abcd") > 0);
     check(strcmp("a\203", "a") > 0); /* Tricky if char signed. */
+    printf("%d", strcmp("a\203", "a"));
     check(strcmp("a\203", "a\003") > 0);
 
     // taken from glibc

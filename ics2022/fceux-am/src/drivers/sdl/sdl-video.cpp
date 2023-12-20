@@ -34,50 +34,48 @@
 #include "../../config.h"
 
 static int s_srendline;
-//static int s_erendline;
-static const int s_tlines = 240;
+// static int s_erendline;
+// static const int s_tlines = 240;
+static const int s_tlines = 120;
 static int s_inited;
 
 #define s_clipSides 0
 
-#define NWIDTH	(256 - (s_clipSides ? 16 : 0))
-#define NOFFSET	(s_clipSides ? 8 : 0)
+#define NWIDTH (256 - (s_clipSides ? 16 : 0))
+#define NOFFSET (s_clipSides ? 8 : 0)
 
 static int s_paletterefresh;
 
-int
-KillVideo()
+int KillVideo()
 {
 	// return failure if the video system was not initialized
-	if(s_inited == 0)
+	if (s_inited == 0)
 		return -1;
 
 	// if the rest of the system has been initialized, shut it down
-		// shut down the system that converts from 8 to 16/32 bpp
-  KillBlitToHigh();
+	// shut down the system that converts from 8 to 16/32 bpp
+	KillBlitToHigh();
 
 	s_inited = 0;
 	return 0;
 }
 
-
 void FCEUD_VideoChanged()
 {
-  PAL = 0; // NTSC and Dendy
+	PAL = 0; // NTSC and Dendy
 }
 
 /**
  * Attempts to initialize the graphical video display.  Returns 0 on
  * success, -1 on failure.
  */
-int
-InitVideo(FCEUGI *gi)
+int InitVideo(FCEUGI *gi)
 {
 	FCEUI_printf("Initializing video...");
 
 	// check the starting, ending, and total scan lines
-	//FCEUI_GetCurrentVidSystem(&s_srendline, &s_erendline);
-	//s_tlines = s_erendline - s_srendline + 1;
+	// FCEUI_GetCurrentVidSystem(&s_srendline, &s_erendline);
+	// s_tlines = s_erendline - s_srendline + 1;
 
 	s_inited = 1;
 
@@ -85,23 +83,23 @@ InitVideo(FCEUGI *gi)
 
 	s_paletterefresh = 1;
 
-	 // if using more than 8bpp, initialize the conversion routines
+	// if using more than 8bpp, initialize the conversion routines
 	InitBlitToHigh(4, 0x00ff0000, 0x0000ff00, 0x000000ff, 0, 0, 0);
 	return 0;
 }
 
-static struct {
-  uint8 r, g, b, unused;
+static struct
+{
+	uint8 r, g, b, unused;
 } s_psdl[256];
 
 /**
  * Sets the color for a particular index in the palette.
  */
-void
-FCEUD_SetPalette(uint8 index,
-                 uint8 r,
-                 uint8 g,
-                 uint8 b)
+void FCEUD_SetPalette(uint8 index,
+					  uint8 r,
+					  uint8 g,
+					  uint8 b)
 {
 	s_psdl[index].r = r;
 	s_psdl[index].g = g;
@@ -115,12 +113,12 @@ static uint32_t canvas[NWIDTH * 240];
 /**
  * Pushes the given buffer of bits to the screen.
  */
-void
-BlitScreen(uint8 *XBuf)
+void BlitScreen(uint8 *XBuf)
 {
 	// refresh the palette if required
-	if(s_paletterefresh) {
-    SetPaletteBlitToHigh((uint8*)s_psdl);
+	if (s_paletterefresh)
+	{
+		SetPaletteBlitToHigh((uint8 *)s_psdl);
 		s_paletterefresh = 0;
 	}
 
@@ -129,27 +127,30 @@ BlitScreen(uint8 *XBuf)
 
 	// XXX soules - again, I'm surprised SDL can't handle this
 	// perform the blit, converting bpp if necessary
-  Blit8ToHigh(XBuf + NOFFSET, (uint8 *)canvas, NWIDTH, s_tlines, NWIDTH * 4, 1, 1);
+	Blit8ToHigh(XBuf + NOFFSET, (uint8 *)canvas, NWIDTH, s_tlines, NWIDTH * 4, 1, 1);
 
 	int scrw = NWIDTH;
 
-
-  // ensure that the display is updated
+	// ensure that the display is updated
 #ifdef HAS_GUI
-  int x = (io_read(AM_GPU_CONFIG).width - 256) / 2;
-  int y = (io_read(AM_GPU_CONFIG).height - 240) / 2;
-  io_write(AM_GPU_FBDRAW, x, y, canvas, scrw, s_tlines, true);
+	int x = (io_read(AM_GPU_CONFIG).width - 256) / 2;
+	int y = (io_read(AM_GPU_CONFIG).height - 240) / 2;
+	io_write(AM_GPU_FBDRAW, x, y, canvas, scrw, s_tlines, true);
 #else
-  printf("\033[0;0H");
-  for (int y = 0; y < s_tlines; y += 4) {
-    //draw_rect(&screen[y][8], xpad, ypad + y, W, 1);
-    for (int x = 0; x < scrw; x += 2) {
-      uint32_t color = canvas[y * 256 + x];
-      const char *list = "o. *O0@#";
-      char c = list[color / 0x222222u];
-      putch(c);
-    }
-    putch('\n');
-  }
+	printf("\n");
+	// printf("\033[0;0H");
+	for (int y = 0; y < s_tlines; y += 4)
+	{
+		// draw_rect(&screen[y][8], xpad, ypad + y, W, 1);
+		for (int x = 0; x < scrw; x += 2)
+		{
+			uint32_t color = canvas[y * 256 + x];
+			const char *list = "o. *O0@#";
+			char c = list[color / 0x222222u];
+			putch(c);
+		}
+		putch('\n');
+	}
+	printf("\n");
 #endif
 }

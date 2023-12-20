@@ -154,6 +154,7 @@ int main(const char *args) {
 
 // Libraries
 
+
 void* bench_alloc(size_t size) {
   size  = (size_t)ROUNDUP(size, 8);
   char *old = hbrk;

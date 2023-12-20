@@ -13,6 +13,8 @@ extern "C" {
 #define MAX(a,b) (((a)>(b))?(a):(b))
 #define MIN(a,b) (((a)<(b))?(a):(b))
 
+#define is_digit(c) ((c) >= '0' && (c) <= '9')
+
 // #define __NATIVE_USE_KLIB__
 
 // string.h
@@ -36,12 +38,12 @@ int    abs       (int x);
 int    atoi      (const char *nptr);
 
 // stdio.h
-int    vprintf(const char *fmt, va_list ap);
-int    printf    (const char *format, ...);
-int    sprintf   (char *str, const char *format, ...);
-int    snprintf  (char *str, size_t size, const char *format, ...);
-int    vsprintf  (char *str, const char *format, va_list ap);
-int    vsnprintf (char *str, size_t size, const char *format, va_list ap);
+int    vprintf   (const char *fmt, va_list ap);
+int    vsprintf  (char *str, const char *fmt, va_list ap);
+int    vsnprintf (char *str, size_t size, const char *fmt, va_list ap);
+int    printf    (const char *fmt, ...);
+int    sprintf   (char *str, const char *fmt, ...);
+int    snprintf  (char *str, size_t size, const char *fmt, ...);
 
 // assert.h
 #ifdef NDEBUG
