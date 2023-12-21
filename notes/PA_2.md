@@ -3310,3 +3310,90 @@ ffmpeg -i MyMusic.mp3 -acodec pcm_s16le -f s16le -ac 1 -ar 44100 44k.pcm
 
 需要调整一下音频文件的解析质量！
 
+
+
+176. **运行slider 程序**
+
+
+
+177. **运行typing-game程序**
+
+
+
+178. **简单的只能跑超级玛丽的litenes也可以运行了**
+
+
+
+179. **游戏的一般思路：**
+
+```c
+while (1) {
+  等待新的一帧();  // AM_TIMER_UPTIME
+  处理用户按键();  // AM_INPUT_KEYBRD
+  更新游戏逻辑();  // TRM
+  绘制新的屏幕();  // AM_GPU_FBDRAW
+}
+```
+
+
+
+180. **NES 的 CPU 和 PPU（图形处理器）**
+
+https://www.nesdev.org/wiki/CPU
+
+https://www.nesdev.org/wiki/PPU
+
+
+
+
+
+181. **LiteNES的性能是可以优化的**
+
+FPS/microbench 的比值来衡量单位计算的FPS
+
+
+
+182. **AM的作用？**
+
+作为一个中间层，如果AM上程序可以运行，那么AM应用就可以移植到任何平台。
+
+
+
+183. **在NEMU上运行NEMU**
+
+am-kernels/kernels/nemu/ 下执行
+
+```shell
+make ARCH=riscv64-nemu mainargs=/home/user/ics2022/am-kernels/kernels/hello/build/hello-riscv64-nemu.bin
+```
+
+1. 保存NEMU当前的配置选项
+2. 加载一个新的配置文件, 将NEMU编译到AM上, 并把`mainargs`指示bin文件作为这个NEMU的镜像文件
+3. 恢复第1步中保存的配置选项
+4. 重新编译NEMU, 并把第2步中的NEMU作为镜像文件来运行
+5. 把NEMU编译到AM时, 配置系统会定义宏`CONFIG_TARGET_AM`, 此时NEMU的行为和之前相比有所变化
+6. sdb, DiffTest等调试功能不再开启, 因为AM无法提供它所需要的库函数(如文件读写, 动态链接, 正则表达式等)
+7. 通过AM IOE来实现NEMU的设备无！
+
+
+
+184. **补充**
+
+```c
+static inline uint32_t inst_fetch(vaddr_t *pc, int len) {
+  uint32_t inst = vaddr_ifetch(*pc, len);
+  (*pc) += len;
+  return inst;
+}
+```
+
+不能同时去掉static 和 inline，可以去除一个
+
+
+
+185. **如果定义全局的static变量没有初始化，重复是没有问题了，但是如果两个地方定义了同一个名字的全局的static变量，并进行了初始化就会有问题，即重复定义。**
+
+
+
+
+
