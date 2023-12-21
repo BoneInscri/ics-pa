@@ -18,6 +18,7 @@ static uint32_t color_buf[32 * 32];
 void redraw() {
   int w = io_read(AM_GPU_CONFIG).width / N;
   int h = io_read(AM_GPU_CONFIG).height / N;
+
   int block_size = w * h;
   assert((uint32_t)block_size <= LENGTH(color_buf));
 

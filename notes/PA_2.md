@@ -3023,4 +3023,98 @@ RPG游戏中的八方向行走，格斗游戏中的组合招式等等
 
 
 
+162. **VGA 的实现？**
+
+nemu/src/device/vga.c
+
+从`0xa1000000`开始的一段用于映射到video memory
+
+**(显存, 也叫frame buffer, 帧缓冲)**的MMIO空间
+
+400x300x32 的空间
+
+一个像素占32个bit的存储空间，R(red)，G(green)，B(blue)，A(alpha)各占8 bit
+
+
+
+163. **24位bit可以支持的颜色数量？**
+
+`2^8*2^8*2^8`约1600万种颜色
+
+
+
+
+
+164. **调色板？**
+
+调色板是一个颜色信息的数组, 每一个元素占4个字节, 分别代表R(red), G(green), B(blue), A(alpha)的值.
+
+一个像素存储的就不再是颜色的信息, 而是一个**调色板的索引**
+
+渐出渐入效果都是通过调色板实现的
+
+
+
+
+
+165. **NEMU的GPU？**
+
+并不支持一个完整GPU的功能，而仅仅保留绘制像素的基本功能
+
+- AM_GPU_CONFIG ：AM显示控制器信息
+
+**width and height**
+
+- AM_GPU_FBDRAW： AM帧缓冲控制器
+
+**向屏幕`(x, y)`坐标处绘制`w*h`的矩形图像。**
+
+图像像素**按行优先方式存储在`pixels`**中，每个像素用32位整数以`00RRGGBB`的方式描述颜色。
+
+若`sync`为`true`, 则马上将帧缓冲中的内容同步到屏幕上。
+
+
+
+166. **实现NEMU的VGA**
+
+- 屏幕大小寄存器 **需要软件AM使用它**
+- 同步寄存器需要实现 **需要硬件NEMU支持它**
+
+
+
+添加测试代码：
+
+__am_gpu_init()
+
+通过测试
+
+am_tests/ 
+
+display test !
+
+```shell
+make ARCH=riscv64-nemu run mainargs=v
+```
+
+实际上还需要实现 **AM_GPU_FBDRAW** 的功能。
+
+
+
+
+
+167. **GPU的5个抽象寄存器**
+
+GPU_CONFIG、GPU_STATUS、GPU_FBDRAW、GPU_MEMCPY、GPU_RENDER
+
+
+
+
+
+
+
+168. **需要注意 x 对应 W，y 对应 H，如果是按行优先，需要将 y 和 x 互换！**
+
+
+
+
 
