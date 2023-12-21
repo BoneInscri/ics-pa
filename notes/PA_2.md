@@ -3118,3 +3118,163 @@ GPU_CONFIG、GPU_STATUS、GPU_FBDRAW、GPU_MEMCPY、GPU_RENDER
 
 
 
+169. 显示的屏幕太小了，可以设置一下：
+
+```c
+SDL_CreateWindowAndRenderer(
+    SCREEN_W * (MUXDEF(CONFIG_VGA_SIZE_400x300, 2, 1)) * 2,
+    SCREEN_H * (MUXDEF(CONFIG_VGA_SIZE_400x300, 2, 1)) * 2,
+    0, &window, &renderer);
+```
+
+
+
+
+
+170. **实现声卡**
+
+SDL_OpenAudio
+
+参考
+
+https://wiki.libsdl.org/SDL2/SDL_OpenAudio
+
+
+
+1. 初始化
+2. 调用回调函数，向缓冲区中写入音频数据
+3. 回调函数返回，播放音频
+
+
+
+MMIO 空间
+
+**nemu/src/device/audio.c**
+
+
+
+初始化参数寄存器：
+
+freq, channels 和 samples 
+
+init 用于初始化
+
+
+
+STREAM_BUF 是MMIO空间，用于存放音频数据
+
+sbuf_size 流缓冲区大小
+
+count 缓冲区已使用的大小
+
+```c
+enum {
+    reg_freq,
+    reg_channels,
+    reg_samples,
+    reg_sbuf_size,
+    reg_init,
+    reg_count,
+    nr_reg
+};
+```
+
+
+
+`0x200`处长度为24个字节的端口
+
+`0xa0000200`处长度为24字节的MMIO空间
+
+`0xa1200000`开始, 长度为64KB的MMIO空间作为流缓冲区.
+
+```c
+#define CONFIG_SB_SIZE 0x10000
+```
+
+
+
+**四个寄存器**
+
+abstract-machine/am/include/amdev.h
+
+AUDIO_CONFIG、AUDIO_CTRL、AUDIO_STATUS、AUDIO_PLAY
+
+- **AUDIO_CONFIG：AM声卡控制器信息**
+
+可读出存在标志`present`以及流缓冲区的大小`bufsize`
+
+bufsize不会发生改变
+
+- **AM_AUDIO_CTRL：AM声卡控制寄存器**
+
+根据写入的`freq`, `channels`和`samples`对声卡进行初始化
+
+- **AM_AUDIO_STATUS：AM声卡状态寄存器**
+
+读出当前流缓冲区已经使用的大小`count`
+
+- **AM_AUDIO_PLAY：AM声卡播放寄存器**
+
+可将`[buf.start, buf.end)`区间的内容作为音频数据写入流缓冲区
+
+**若当前流缓冲区的空闲空间少于即将写入的音频数据，此次写入将会一直等待**，直到有足够的空闲空间将音频数据完全写入流缓冲区才会返回
+
+
+
+跑通 am-tests 的 audio test
+
+```shell
+make ARCH=native run mainargs=a
+```
+
+
+
+主要需要看的文件：
+
+- nemu/src/device/audio.c 
+- abstract-machine/am/src/platform/nemu/ioe/audio.c
+
+
+
+修改下面三个参数，看播放的音频有什么变化？
+
+**freq, channels和samples**
+
+
+
+维护缓冲区需要的工作：
+
+将缓冲区看成是一个队列，程序通过`AM_AUDIO_PLAY`的抽象往流缓冲区里面写入音频数据，而SDL库的回调函数则从流缓冲区里面读出音频数据。
+
+
+
+171. **调整音频解码的质量：**
+
+fceux-am/src/config.h
+
+高质量(SOUND_HQ)，低质量(SOUND_LQ)以及无音效(SOUND_NON
+
+
+
+
+
+172. **音乐有白噪声？**
+
+如果回调函数需要的数据量大于当前流缓冲区中的数据量，你还需要把SDL提供的缓冲区剩余的部分清零，以避免把一些垃圾数据当做音频，从而产生噪音。
+
+
+
+**千万不要一边读/写缓冲区，一边修改count！**
+
+
+
+173. **修改播放的背景音乐！**
+
+![image-20231221231240249](PA_2.assets/image-20231221231240249.png)
+
+
+
+```shell
+ffmpeg -i MyMusic.mp3 -acodec pcm_s16le -f s16le -ac 1 -ar 44100 44k.pcm
+```
+

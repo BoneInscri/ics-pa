@@ -1,7 +1,9 @@
 #include <amtest.h>
 
-void audio_test() {
-  if (!io_read(AM_AUDIO_CONFIG).present) {
+void audio_test()
+{
+  if (!io_read(AM_AUDIO_CONFIG).present)
+  {
     printf("WARNING: %s does not support audio\n", TOSTRING(__ARCH__));
     return;
   }
@@ -13,7 +15,8 @@ void audio_test() {
   int nplay = 0;
   Area sbuf;
   sbuf.start = &audio_payload;
-  while (nplay < audio_len) {
+  while (nplay < audio_len)
+  {
     int len = (audio_len - nplay > 4096 ? 4096 : audio_len - nplay);
     sbuf.end = sbuf.start + len;
     io_write(AM_AUDIO_PLAY, sbuf);
@@ -23,5 +26,6 @@ void audio_test() {
   }
 
   // wait until the audio finishes
-  while (io_read(AM_AUDIO_STATUS).count > 0);
+  while (io_read(AM_AUDIO_STATUS).count > 0)
+    ;
 }

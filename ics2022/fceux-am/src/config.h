@@ -1,7 +1,7 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-// #define HAS_GUI
+#define HAS_GUI
 
 #define SOUND_NONE 0
 #define SOUND_LQ   1
@@ -14,7 +14,7 @@
 #if defined(__ARCH_NATIVE) || defined(__PLATFORM_QEMU)
 # define PERF_CONFIG PERF_HIGH
 #elif defined(__PLATFORM_NEMU)
-# define PERF_CONFIG PERF_MIDDLE
+# define PERF_CONFIG PERF_LOW
 #else
 # define PERF_CONFIG PERF_LOW
 #endif
