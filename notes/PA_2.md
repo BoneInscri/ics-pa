@@ -3240,6 +3240,10 @@ make ARCH=native run mainargs=a
 
 **freq, channels和samples**
 
+- freq 越小，音乐越慢；freq越大，音乐越快
+- channels ，为1表示是单声道，为2表示是立体声
+- samples越大，音乐可能越不连续，samples越小，音乐越连续
+
 
 
 维护缓冲区需要的工作：
@@ -3277,4 +3281,32 @@ fceux-am/src/config.h
 ```shell
 ffmpeg -i MyMusic.mp3 -acodec pcm_s16le -f s16le -ac 1 -ar 44100 44k.pcm
 ```
+
+
+
+
+
+174. **程序卡，帧率低的主要问题就是没有关闭所有的trace 和 diff-test ！！！**
+
+
+
+
+
+175. **虽然通过了测试，但是似乎fceux运行时没有声音？**
+
+```c
+#define PERF_LOW    0
+#define PERF_MIDDLE 1
+#define PERF_HIGH   2
+
+#if defined(__ARCH_NATIVE) || defined(__PLATFORM_QEMU)
+# define PERF_CONFIG PERF_HIGH
+#elif defined(__PLATFORM_NEMU)
+# define PERF_CONFIG PERF_MIDDLE
+#else
+# define PERF_CONFIG PERF_LOW
+#endif
+```
+
+需要调整一下音频文件的解析质量！
 
