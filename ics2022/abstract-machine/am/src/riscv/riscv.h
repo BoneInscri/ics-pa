@@ -31,4 +31,7 @@ enum { MODE_U, MODE_S, MODE_M = 3 };
 #define MSTATUS_UXL  0
 #endif
 
+#define S_SYSCALL 9
+#define M_SYSCALL 11
+
 #endif

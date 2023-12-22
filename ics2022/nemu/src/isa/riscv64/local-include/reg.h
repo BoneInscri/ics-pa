@@ -23,11 +23,24 @@ static inline int check_reg_idx(int idx) {
   return idx;
 }
 
+static inline int check_csr_idx(int idx) {
+  IFDEF(CONFIG_RT_CHECK, assert(idx >= 0 && idx < 4096));
+  return idx;
+}
+
 #define gpr(idx) (cpu.gpr[check_reg_idx(idx)])
+#define csr(idx) (cpu.csr[check_csr_idx(idx)])
 
 static inline const char* reg_name(int idx, int width) {
   extern const char* regs[];
   return regs[check_reg_idx(idx)];
 }
+
+#define mtvec 0x305
+#define mstatus 0x300
+#define mepc 0x341
+#define mcause 0x342
+#define mtval 0x343
+
 
 #endif

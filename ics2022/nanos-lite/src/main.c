@@ -15,9 +15,10 @@ int main() {
 
   init_mm();
 
-  init_device();
 
-  init_ramdisk();
+  init_device();// 对设备进行一些初始化操作
+
+  init_ramdisk();// 初始化ramdisk
 
 #ifdef HAS_CTE
   init_irq();
@@ -26,6 +27,7 @@ int main() {
   init_fs();
 
   init_proc();
+  // 初始化文件系统和创建进程
 
   Log("Finish initialization");
 

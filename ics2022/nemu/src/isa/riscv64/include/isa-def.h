@@ -18,9 +18,13 @@
 
 #include <common.h>
 
+#define gpr_n 1<<5
+#define csr_n 1<<12
+
 typedef struct {
-  word_t gpr[32];
+  word_t gpr[gpr_n];
   vaddr_t pc;
+  word_t csr[csr_n];
 } riscv64_CPU_state;
 
 // decode
