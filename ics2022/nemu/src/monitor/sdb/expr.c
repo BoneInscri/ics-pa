@@ -247,6 +247,7 @@ static word_t GET_NUM(int pos)
   case TK_NUM_REG:
     bool success = false;
     num_tmp = isa_reg_str2val(tokens[pos].str, &success);
+    // printf("success : %d, num_tmp : %ld\n", success, num_tmp);
     if (!success)
     {
       valid = 0;

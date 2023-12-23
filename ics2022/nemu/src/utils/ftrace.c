@@ -165,8 +165,7 @@ __attribute__((used)) static void Elf64_Ehdr_parse(ELF_helper *elf_helper)
     elf_helper->e_shstrndx = ehdr.e_shstrndx;
 }
 
-__attribute__((used))
-void init_ftrace(const char *elf_file)
+__attribute__((used)) void init_ftrace(const char *elf_file)
 {
     elf_fp = stdin;
     if (elf_file != NULL)
@@ -217,14 +216,13 @@ static int section_pc2func_idx(vaddr_t pc)
     return -1;
 }
 
-__attribute__((used))
-void Call_print(vaddr_t caller_pc, vaddr_t callee_pc)
+__attribute__((used)) void Call_print(vaddr_t caller_pc, vaddr_t callee_pc)
 {
     int caller_idx = section_pc2func_idx(caller_pc);
     int callee_idx = first_pc2func_idx(callee_pc);
     if (caller_idx == -1)
         assert(caller_pc == 0x8000000c);
-    if (callee_idx == -1)// not a function, just return !
+    if (callee_idx == -1) // not a function, just return !
     {
         log_write("callee_pc : %lx\n", callee_pc);
         return;
@@ -244,8 +242,7 @@ void Call_print(vaddr_t caller_pc, vaddr_t callee_pc)
         log_write("call(%s) [%s@%lx]\n", &str_table[funcs[caller_idx].st_name], &str_table[funcs[callee_idx].st_name], callee_pc);
 }
 
-__attribute__((used))
-void Ret_print(vaddr_t ret_from_pc, vaddr_t ret_to_pc)
+__attribute__((used)) void Ret_print(vaddr_t ret_from_pc, vaddr_t ret_to_pc)
 {
     int ret_from_idx = section_pc2func_idx(ret_from_pc);
     int ret_to_idx = section_pc2func_idx(ret_to_pc);

@@ -26,7 +26,7 @@ Context *__am_irq_handle(Context *c)
     case M_SYSCALL:
       ev.event = EVENT_YIELD;
       c->mepc += 4;
-      printf("triger a yield event, mepc : %lx\n", c->mepc);
+      printf("triger a yield event, mepc : %lx, a0 = %d\n", c->mepc, c->gpr[10]);
       break;
     default:
       ev.event = EVENT_ERROR;

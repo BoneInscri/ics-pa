@@ -14,8 +14,7 @@ int main() {
   Log("Build time: %s, %s", __TIME__, __DATE__);
 
   init_mm();
-
-
+  
   init_device();// 对设备进行一些初始化操作
 
   init_ramdisk();// 初始化ramdisk

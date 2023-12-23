@@ -116,9 +116,10 @@ static int cmd_p(char *args)
   {
     goto fail;
   }
-  bool success;
+  bool success = true;
 
   word_t EXPR = expr(args, &success);
+  // if (success && valid)
   if (success && valid)
     printf("0x%lx %ld\n", EXPR, EXPR);
   // else

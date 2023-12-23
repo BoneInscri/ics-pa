@@ -825,9 +825,226 @@ mips32和riscv32则通过`sw`指令将各个通用寄存器依次压栈。
 
 https://github.com/NJU-ProjectN/navy-apps
 
+```bash
+cd ics2022
+bash init.sh navy-apps
+```
+
 
 
 59. **newlib**
+
+https://sourceware.org/newlib/
+
+navy-apps/libs/libc
+
+
+
+60. **程序入口**
+
+navy-apps/libs/libos/src/crt0/start/$ISA.S 的 _start 函数
+
+ctr0 的 ctr 就是 C RunTime
+
+`_start()`函数会调用`navy-apps/libs/libos/src/crt0/crt0.c`中的`call_main()`函数，
+
+然后调用用户程序的`main()`函数，从`main()`函数返回后会调用`exit()`结束运行。
+
+
+
+61. **运行第一个用户程序 dummy**
+
+在`navy-apps/tests/dummy/`目录下执行
+
+```shell
+make ISA = riscv64
+```
+
+编译成功后把`navy-apps/tests/dummy/build/dummy-riscv64`手动复制并重命名为`nanos-lite/build/ramdisk.img`, 然后在`nanos-lite/`目录下执行
+
+```shell
+make ARCH=riscv64-nemu
+```
+
+
+
+ramdisk镜像文件包含在了nanos-lite中，成为了其一部分。
+
+`nanos-lite/src/resources.S`
+
+
+
+62. **可执行文件在哪里？**
+
+位于ramdisk偏移为0处，访问它就可以得到用户程序的第一个字节。
+
+
+
+63. **可执行文件的组织？**
+
+ELF文件格式包含程序本身的代码和静态数据，还包括一些用来描述它们的信息
+
+不同组织形式形成了不同格式的可执行文件
+
+例如
+
+- Windows主流的可执行文件是PE(Portable Executable)格式
+- GNU/Linux主要使用ELF(Executable and Linkable Format)格式
+
+ELF是GNU/Linux可执行文件的标准格式
+
+https://stackoverflow.com/questions/2171177/what-is-an-application-binary-interface-abi
+
+
+
+64. **堆和栈没有放入可执行文件中，而是通过AM进行管理**
+
+
+
+65. **两种视角看待一个可执行ELF文件**
+
+- 面向链接过程的section视角，这个视角提供了用于**链接与重定位**的信息(例如符号表)
+- 面向执行的segment视角，这个视角提供了用于**加载可执行文件**的信息
+
+一个segment可能由0个或多个section组成，但一个section可能不被包含于任何segment中
+
+
+
+66. **加载程序需要关注segment的视角**
+
+ELF中采用program header table来管理segment，program header table的一个表项描述了一个segment的所有属性，包括**类型，虚拟地址，标志，对齐方式，以及文件内偏移量和segment大小**。
+
+
+
+67. **通过PT_LOAD来判断一个segment是否需要加载**
+
+加载一个可执行文件并不是加载它所包含的所有内容，只要加载那些与运行时刻相关的内容就可以了，例如调试信息和符号表就不必加载。
+
+
+
+68. **FileSize 和 MemSize ？**
+
+一些bss段在磁盘上是不占用空间的，但是一旦加载到内存就会占用空间。
+
+所以 MemSize >= FileSize
+
+
+
+69. **程序从何而来？**
+
+https://www.tenouk.com/ModuleW.html#google_vignette
+
+
+
+70. **如何加载一个segment**
+
+```
+      +-------+---------------+-----------------------+
+      |       |...............|                       |
+      |       |...............|                       |  ELF file
+      |       |...............|                       |
+      +-------+---------------+-----------------------+
+      0       ^               |              
+              |<------+------>|       
+              |       |       |             
+              |       |                            
+              |       +----------------------------+       
+              |                                    |       
+   Type       |   Offset    VirtAddr    PhysAddr   |FileSiz  MemSiz   Flg  Align
+   LOAD       +-- 0x001000  0x03000000  0x03000000 +0x1d600  0x27240  RWE  0x1000
+                               |                       |       |     
+                               |   +-------------------+       |     
+                               |   |                           |     
+                               |   |     |           |         |       
+                               |   |     |           |         |      
+                               |   |     +-----------+ ---     |     
+                               |   |     |00000000000|  ^      |   
+                               |   | --- |00000000000|  |      |    
+                               |   |  ^  |...........|  |      |  
+                               |   |  |  |...........|  +------+
+                               |   +--+  |...........|  |      
+                               |      |  |...........|  |     
+                               |      v  |...........|  v    
+                               +-------> +-----------+ ---  
+                                         |           |     
+                                         |           |    
+                                            Memory
+```
+
+相对文件偏移`Offset`指出相应segment的内容从ELF文件的第`Offset`字节开始，在文件中的大小为`FileSiz`，它需要被分配到以`VirtAddr`为首地址的虚拟内存位置，在内存中它占用大小为`MemSiz`。
+
+注意MemSiz 多出来的部分需要清0
+
+这个segment使用的内存就是`[VirtAddr, VirtAddr + MemSiz)`这一连续区间
+
+- 然后将segment的内容从ELF文件中**读入到这一内存区间**，
+
+- 并**将**`[VirtAddr + FileSiz, VirtAddr + MemSiz)`**对应的物理区间清零**。
+
+
+
+71. **实现一个 loader可能需要用的接口**
+
+```c
+// 从ramdisk中`offset`偏移处的`len`字节读入到`buf`中
+size_t ramdisk_read(void *buf, size_t offset, size_t len);
+
+// 把`buf`中的`len`字节写入到ramdisk中`offset`偏移处
+size_t ramdisk_write(const void *buf, size_t offset, size_t len);
+
+// 返回ramdisk的大小, 单位为字节
+size_t get_ramdisk_size();
+```
+
+
+
+72. **程序的本质？**
+
+程序的最为原始的状态：比特串
+
+加载程序其实就是**把这一毫不起眼的比特串放置在正确的位置**，但这其中又折射出"**存储程序**"的划时代思想。
+
+操作系统将控制权交给它的时候, 计算机把它解释成指令并逐条执行。
+
+loader让计算机的生命周期突破程序的边界：
+
+一个程序结束并不意味着计算机停止工作，**计算机将终其一生履行执行程序的使命**。
+
+
+
+73. **添加一个判定魔数的assert**
+
+```c
+assert(*(uint32_t *)elf->e_ident == 0xBadC0de);
+```
+
+
+
+74. **不仅需要让 nanos-lite在riscv64-nemu上跑起来，还需要在native上跑起来**
+
+
+
+
+
+75. **elf文件的手册和资料**
+
+```shell
+man 5 elf
+```
+
+
+
+76. **实现loader需要看的**
+
+- init_proc
+- -> loader
+- -> naive_uload
+
+
+
+77. **Executable File format**
+
+![image-20231223163447470](PA_3.assets/image-20231223163447470.png)
 
 
 

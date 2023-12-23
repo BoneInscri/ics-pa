@@ -18,4 +18,7 @@ typedef union {
 
 extern PCB *current;
 
+
+void naive_uload(PCB *pcb, const char *filename);
+
 #endif
