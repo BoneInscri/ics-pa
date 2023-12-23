@@ -45,6 +45,7 @@ static void regs_diff_display(CPU_state *ref_r, vaddr_t pc) {
 
 bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
   if(ref_r->pc!= cpu.pc) {
+    regs_diff_display(ref_r, pc);
     return false;
   }
   for (int i = 0; i < N_REGS; i++) {

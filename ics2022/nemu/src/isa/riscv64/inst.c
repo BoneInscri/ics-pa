@@ -193,11 +193,10 @@ static int decode_exec(Decode *s)
         csr(imm) = src1;
       } while (0));
   INSTPAT(
-    "???????????? ????? 010 ????? 1110011", csrrs, I, do {
-      R(rd) = csr(imm);
-      csr(imm) |= src1;
-    } while (0));
-  
+      "???????????? ????? 010 ????? 1110011", csrrs, I, do {
+        R(rd) = csr(imm);
+        csr(imm) |= src1;
+      } while (0));
 
   // ================ S-type ======================
   INSTPAT("??????? ????? ????? 011 ????? 0100011", sd, S, Mw(src1 + imm, 8, src2)); // 64bits
@@ -268,9 +267,11 @@ static int decode_exec(Decode *s)
       "??????? ????? ????? 110 ????? 1100011", bltu, B, if (src1 < src2) { s->dnpc = s->pc + imm; }); // < (unsigned)
   // 就是当前指令的地址 + offset
 
-  #define M_SYSCALL 11
+#define M_SYSCALL 11
   // 其他
   INSTPAT("000000000000 00000 000 00000 1110011", ecall, N, s->dnpc = isa_raise_intr(M_SYSCALL, s->pc));
+  INSTPAT("0011000 00010 00000 000 00000 1110011", mret, N, s->dnpc = csr(mepc));
+
   INSTPAT("000000000001 00000 000 00000 1110011", ebreak, N, NEMUTRAP(s->pc, R(10))); // R(10) is $a0
 
   // 非法
