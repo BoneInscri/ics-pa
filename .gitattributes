@@ -1,3 +1,5 @@
 *.js linguist-language=c
 *.html linguist-language=c
 *.css linguist-language=c
+*.yacc linguist-language=c
+*.lex linguist-language=c
