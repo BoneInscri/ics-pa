@@ -12,7 +12,7 @@
 #if defined(__ISA_AM_NATIVE__)
 # define EXPECT_TYPE EM_X86_64
 #elif defined(__ISA_RISCV64__)
-# define EXPECT_TYP EM_RISCV  
+# define EXPECT_TYPE EM_RISCV  
 #else
 # error Unsupported ISA
 #endif
@@ -45,7 +45,7 @@ static void Elf_Ehdr_parser(ELF_LoadHelper *load_helper)
   assert(ehdr.e_ident[EI_ABIVERSION] == ELFOSABI_SYSV); // the version of the ABI
 
   assert(ehdr.e_type == ET_EXEC);
-  assert(ehdr.e_machine == EXPECT_TYPE);
+  assert(ehdr.e_machine == EM_RISCV);
   assert(ehdr.e_version == EV_CURRENT);
 
   assert(ehdr.e_ehsize == sizeof(Elf_Ehdr));

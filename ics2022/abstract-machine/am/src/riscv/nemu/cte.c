@@ -2,6 +2,9 @@
 #include <riscv/riscv.h>
 #include <klib.h>
 
+// i -> 0 1 2 3 4 5 6 7
+#define get_syscall_args(i) (c->gpr[10 + i])
+
 static Context *(*user_handler)(Event, Context *) = NULL;
 
 __attribute__((used)) static void print_context(Context *c)
@@ -26,7 +29,7 @@ Context *__am_irq_handle(Context *c)
     case M_SYSCALL:
       ev.event = EVENT_YIELD;
       c->mepc += 4;
-      printf("triger a yield event, mepc : %lx, a0 = %d\n", c->mepc, c->gpr[10]);
+      // printf("triger a yield event, mepc : %lx, a0 = %d\n", c->mepc, c->gpr[10]);
       break;
     default:
       ev.event = EVENT_ERROR;
