@@ -1108,3 +1108,29 @@ man syscalls
 
 
 
+84. **添加strace观察系统调用的行为**
+
+计算机只做两件事：
+
+1. 本地计算
+2. 通过系统调用请求操作系统来完成那些本地计算无法完成的工作
+
+Linux下安装strace
+
+```shell
+sudo apt install strace
+```
+
+Linux 下使用strace
+
+```shell
+strace ls
+strace strace l
+```
+
+
+
+
+
+
+

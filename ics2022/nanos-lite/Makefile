@@ -5,7 +5,13 @@ RAMDISK_FILE = build/ramdisk.img
 NAME = nanos-lite
 SRCS = $(shell find -L ./src/ -name "*.c" -o -name "*.cpp" -o -name "*.S")
 
+STRACE ?= 1
+ifeq ($(STRACE), 1)
+CFLAGS += -D__STRACE__
+endif
+
 include $(AM_HOME)/Makefile
+$(info $(CFLAGS))
 
 ifeq ($(ARCH),native)
 ISA = am_native
@@ -21,7 +27,6 @@ files = $(RAMDISK_FILE) src/files.h src/syscall.h
 # create an empty file if it does not exist
 $(foreach f,$(files),$(if $(wildcard $f),, $(shell touch $f)))
 else
-
 
 update:
 	@echo hello update
