@@ -5,7 +5,7 @@ RAMDISK_FILE = build/ramdisk.img
 NAME = nanos-lite
 SRCS = $(shell find -L ./src/ -name "*.c" -o -name "*.cpp" -o -name "*.S")
 
-STRACE ?= 1
+STRACE ?= 0
 ifeq ($(STRACE), 1)
 CFLAGS += -D__STRACE__
 endif

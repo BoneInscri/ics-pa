@@ -48,6 +48,43 @@ static const char *sysnum_2_sysname[] = {
     [SYS_gettimeofday] = "gettimeofday"};
 #endif
 
+#define STDIN 0
+#define STDOUT 1
+#define STDERROR 2
+
+static void do_yield(Context *c)
+{
+  c->RETVAL = 0;
+}
+
+static void do_exit(Context *c)
+{
+  halt(c->ARG1);
+}
+
+// ssize_t write(int fd, const void *buf, size_t count);
+static void do_write(Context *c)
+{
+  int fd = c->ARG1;
+  char *buf = (char*)(c->ARG2);
+  size_t count = c->ARG3;
+  assert(fd == STDOUT || fd == STDERROR);
+  assert(buf);
+  assert(count > 0);
+  for(int i = 0;i<count;i++) {
+    putch(buf[i]);
+  }  
+  c->RETVAL = count;
+}
+
+static void (*syscall_funcs[])(Context *) = {
+    [SYS_exit] = do_exit,
+    [SYS_yield] = do_yield,
+    [SYS_write] = do_write};
+
+#define ARRLEN(arr) (int)(sizeof(arr) / sizeof(arr[0]))
+#define N_SYSCALL ARRLEN(syscall_funcs)
+
 void do_syscall(Context *c)
 {
   uintptr_t sys_num = c->SYSNUM;
@@ -55,15 +92,15 @@ void do_syscall(Context *c)
   printf("syscall num : %d, name : %s\n", sys_num, sysnum_2_sysname[sys_num]);
 #endif
 
-  switch (sys_num)
+  int find = 0;
+  for (int num = 0; num < N_SYSCALL; num++)
   {
-  case SYS_yield:
-    c->RETVAL = 0;
-    break;
-  case SYS_exit:
-    halt(c->ARG1);
-    break;
-  default:
-    panic("Unhandled syscall ID = %d", sys_num);
+    if (sys_num == num)
+    {
+      syscall_funcs[sys_num](c);
+      find = 1;
+    }
   }
+  if (!find)
+    panic("Unhandled syscall ID = %d", sys_num);
 }
