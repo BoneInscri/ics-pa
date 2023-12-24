@@ -9,6 +9,14 @@
 #define Elf_Phdr Elf32_Phdr
 #endif
 
+#if defined(__ISA_AM_NATIVE__)
+# define EXPECT_TYPE EM_X86_64
+#elif defined(__ISA_RISCV64__)
+# define EXPECT_TYP EM_RISCV  
+#else
+# error Unsupported ISA
+#endif
+
 extern size_t ramdisk_read(void *buf, size_t offset, size_t len);
 
 static uint8_t __Mag_num[] = {ELFMAG0, ELFMAG1, ELFMAG2, ELFMAG3};
@@ -37,7 +45,7 @@ static void Elf_Ehdr_parser(ELF_LoadHelper *load_helper)
   assert(ehdr.e_ident[EI_ABIVERSION] == ELFOSABI_SYSV); // the version of the ABI
 
   assert(ehdr.e_type == ET_EXEC);
-  assert(ehdr.e_machine == EM_RISCV);
+  assert(ehdr.e_machine == EXPECT_TYPE);
   assert(ehdr.e_version == EV_CURRENT);
 
   assert(ehdr.e_ehsize == sizeof(Elf_Ehdr));
