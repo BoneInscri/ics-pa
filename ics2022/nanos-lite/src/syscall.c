@@ -66,21 +66,44 @@ static void do_exit(Context *c)
 static void do_write(Context *c)
 {
   int fd = c->ARG1;
-  char *buf = (char*)(c->ARG2);
+  char *buf = (char *)(c->ARG2);
   size_t count = c->ARG3;
   assert(fd == STDOUT || fd == STDERROR);
   assert(buf);
   assert(count > 0);
-  for(int i = 0;i<count;i++) {
+  for (int i = 0; i < count; i++)
+  {
     putch(buf[i]);
-  }  
+  }
   c->RETVAL = count;
+}
+
+// static void printf_buf(char *s, int len)
+// {
+//   for (int i = 0; i < len; i++)
+//   {
+//     putch(s[i]);
+//   }
+// }
+
+uintptr_t brk = 0;
+
+static void do_brk(Context *c)
+{
+  assert(brk != 0);
+  // uintptr_t brk_old = brk;
+  intptr_t increment = c->ARG1; 
+  brk += increment;
+  // panic("brk error");
+  // c->RETVAL = 0;
+  c->RETVAL = brk;
 }
 
 static void (*syscall_funcs[])(Context *) = {
     [SYS_exit] = do_exit,
     [SYS_yield] = do_yield,
-    [SYS_write] = do_write};
+    [SYS_write] = do_write,
+    [SYS_brk] = do_brk};
 
 #define ARRLEN(arr) (int)(sizeof(arr) / sizeof(arr[0]))
 #define N_SYSCALL ARRLEN(syscall_funcs)
@@ -90,6 +113,7 @@ void do_syscall(Context *c)
   uintptr_t sys_num = c->SYSNUM;
 #ifdef __STRACE__
   printf("syscall num : %d, name : %s\n", sys_num, sysnum_2_sysname[sys_num]);
+  printf("arg1 : %lx, arg2 : %lx, arg3 : %lx\n", c->ARG1, c->ARG2, c->ARG3);
 #endif
 
   int find = 0;

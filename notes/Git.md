@@ -126,3 +126,11 @@ git push origin --delete [branch_name]
 
 
 
+16. 撤销commit
+
+````shell
+git reset HEAD^
+````
+
+
+

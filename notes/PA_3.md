@@ -1203,23 +1203,118 @@ ssize_t write(int fd, const void *buf, size_t count);
 
 
 
+90. **如何实现malloc和free函数？**
+
+klibc 中的malloc和free？
+
+**它们的作用是在用户程序的堆区中申请/释放一块内存区域。**
+
+一个用户程序可用的内存区域是需要经过操作系统的分配和管理的。
+
+操作系统做的事情就是通过sbrk对用户程序的堆区大小进行调整。
+
+```c
+void* sbrk(intptr_t increment);
+```
+
+`malloc()`被第一次调用的时候，会通过`sbrk(0)`来查询用户程序当前program break的位置，之后就可以通过后续的`sbrk()`调用来**动态调整用户程序program break的位置了**。
 
 
 
+91. **malloc和sbrk？**
+
+用户程序在第一次调用`printf()`的时候会尝试通过`malloc()`申请一片缓冲区，来存放格式化的内容。
+
+若申请失败，就会**逐个字符进行输出**。
 
 
 
+92. **编写sbrk系统调用**
+
+`_sbrk()`通过记录的方式来对用户程序的program break位置进行管理。
+
+1. program break一开始的位置位于`_end`
+2. 被调用时，根据记录的program break位置和参数`increment`，计算出新program break
+3. 通过`SYS_brk`系统调用来让操作系统设置新program break
+4. 若`SYS_brk`系统调用成功，该系统调用会返回`0`，此时更新之前记录的program break的位置，**并将旧program break的位置作为`_sbrk()`的返回值返回**
+5. 若该系统调用失败，`_sbrk()`会返回`-1`
 
 
 
+93. **查询手册**
+
+```shell
+man 2 sbrk
+man 3 end
+```
+
+**etext**
+
+This is the first address past the end of the text segment (the program code).   
+
+**edata**
+
+This is the first address past the end of the initialized data segment.
+
+**end**
+
+This is the first address past the end of the uninitialized data segment (also known as the BSS segment).
 
 
 
+94. **注意事项**
+
+- 不要在`_sbrk()`中通过`printf()`进行输出
+- 可以通过`sprintf()`先把调试信息输出到一个字符串缓冲区中，然后通过`_write()`进行输出
 
 
 
+95. **实现sbrk 的目标**
 
-#### 
+`printf()`不再是逐个字符地通过`write()`进行输出，而是将格式化完毕的字符串通过一次性进行输出
+
+
+
+96. **使用批处理（batching）技术加速系统调用**
+
+ 将一些简单的任务累积起来，然后再一次性进行处理
+
+缓冲区是批处理技术的核心，libc中的`fread()`和`fwrite()`正是通过缓冲区来将数据累积起来，然后再通过一次系统调用进行处理。
+
+例如通过一个1024字节的缓冲区，**就可以通过一次系统调用直接输出1024个字符，而不需要通过1024次系统调用来逐个字符地输出**。
+
+显然，后者的开销比前者大得多。
+
+http://arkanis.de/weblog/2017-01-05-measurements-of-system-call-performance-and-overhead
+
+
+
+97. **为什么再printf后面最好加上 `\n`？**
+
+`fwrite()`的实现中有缓冲区，`printf()`打印的字符不一定会马上通过`write()`系统调用输出，但遇到`\n`时**可以强行将缓冲区中的内容进行输出。**
+
+navy-apps/libs/libc/src/stdio/wbuf.c
+
+
+
+98. **必答的问题**
+
+我们知道`navy-apps/tests/hello/hello.c`只是一个C源文件，它会被编译链接成一个ELF文件。
+
+- hello程序一开始在哪里？
+- 它是怎么出现内存中的？
+- 为什么会出现在目前的内存位置？
+- 它的第一条指令在哪里？
+- 究竟是怎么执行到它的第一条指令的？
+- hello程序在不断地打印字符串，每一个字符又是经历了什么才会最终出现在终端上？
+
+
+
+99. **支持多个ELF的ftrace**
+
+我们可以让NEMU的ftrace支持多个ELF，如果一个地址不属于某个ELF中的任何一个函数，那就尝试下一个ELF。ftrace就可以**同时追踪Nanos-lite和用户程序的函数调用**了。
+
+
 
 
 
