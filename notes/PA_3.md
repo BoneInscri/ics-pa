@@ -1314,6 +1314,18 @@ navy-apps/libs/libc/src/stdio/wbuf.c
 
 我们可以让NEMU的ftrace支持多个ELF，如果一个地址不属于某个ELF中的任何一个函数，那就尝试下一个ELF。ftrace就可以**同时追踪Nanos-lite和用户程序的函数调用**了。
 
+这个问题不好解决。。。
+
+Nanos-lite 的 ELF 文件在 NEMU中读取，但是 用户程序的ELF呢？？
+
+
+
+用户程序的ELF和nanos-lite 的elf文件在同一个目录下，这就好办了！
+
+
+
+
+
 
 
 

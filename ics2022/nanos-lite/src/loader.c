@@ -28,7 +28,7 @@ extern size_t ramdisk_read(void *buf, size_t offset, size_t len);
 static uint8_t __Mag_num[] = {ELFMAG0, ELFMAG1, ELFMAG2, ELFMAG3};
 
 #define str_table_max 2000
-#define shdr_table_max 40
+#define shdr_table_max 15
 typedef struct
 {
   Elf64_Addr e_entry; /* Entry point virtual address */
@@ -124,19 +124,20 @@ static void Elf_Shdr_parser(ELF_LoadHelper *load_helper)
 
   assert(load_helper->e_shnum <= shdr_table_max);
 
-
+  int first = 1;
   for (int i = 0; i < load_helper->e_shnum; i++)
   {
     ramdisk_read((void *)&shdr, load_helper->e_shoff + i * elem_size, elem_size);
     load_helper->shdr_table[i] = shdr;
-    if (shdr.sh_type == SHT_STRTAB && i != load_helper->e_shstrndx)
-    {
-      load_helper->e_strndx = i;
-    }
     if (shdr.sh_type == SHT_SYMTAB)
     {
       load_helper->e_symdx = i;
-      printf("e_symdx : %d\n", load_helper->e_symdx); 
+    }
+
+    if (shdr.sh_type == SHT_STRTAB && first)
+    {
+      load_helper->e_strndx = i;
+      first = 0;
     }
   }
 }
@@ -152,7 +153,6 @@ static void Elf_Str_parse(ELF_LoadHelper *loader_helper)
 // symbol table
 static void Elf_Sym_parser(ELF_LoadHelper *load_helper)
 {
-  printf("e_symdx : %d\n", load_helper->e_symdx);
   Elf_Shdr shdr_sym = load_helper->shdr_table[load_helper->e_symdx];
   int elem_size = sizeof(Elf_Sym);
   load_helper->e_symnum = shdr_sym.sh_size / elem_size;
@@ -164,8 +164,9 @@ static void Elf_Sym_parser(ELF_LoadHelper *load_helper)
     ramdisk_read((void *)&sym, shdr_sym.sh_offset + i * elem_size, elem_size);
     if (Elf_ST_TYPE((sym.st_info)) == STT_NOTYPE)
     {
-      char* name = &(load_helper->str_table[sym.st_name]);
-      if(!strcmp(name, "_end")) {
+      char *name = &(load_helper->str_table[sym.st_name]);
+      if (!strcmp(name, "_end"))
+      {
         extern uintptr_t brk;
         brk = sym.st_value;
       }
