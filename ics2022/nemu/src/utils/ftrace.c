@@ -276,11 +276,12 @@ __attribute__((used)) void Call_print(vaddr_t caller_pc, vaddr_t callee_pc)
         int elf_idx = funcs[callee_idx].idx;
 
         // if(elf_idx == 1)         
-        my_log("call(__start) [%s@%lx]\n", &(str_table[elf_idx][funcs[callee_idx].st_name]), callee_pc);
+        // my_log("call(__start) [%s@%lx]\n", &(str_table[elf_idx][funcs[callee_idx].st_name]), callee_pc);
+        my_log("call [%s@%lx]\n", &(str_table[elf_idx][funcs[callee_idx].st_name]), callee_pc);
     }
     else
     {
-        int elf_idx_1 = funcs[caller_idx].idx;
+        // int elf_idx_1 = funcs[caller_idx].idx;
         int elf_idx_2 = funcs[callee_idx].idx;
 
         // if(elf_idx_2 == 1 && callee_pc == 0x830016e4) {
@@ -288,8 +289,8 @@ __attribute__((used)) void Call_print(vaddr_t caller_pc, vaddr_t callee_pc)
         //     printf("call(%s) [%s@%lx]\n", &(str_table[elf_idx_1][funcs[caller_idx].st_name]), &(str_table[elf_idx_2][funcs[callee_idx].st_name]), callee_pc);
         //     panic("pause");
         // }
-        // if(elf_idx_2 == 1)
-        my_log("call(%s) [%s@%lx]\n", &(str_table[elf_idx_1][funcs[caller_idx].st_name]), &(str_table[elf_idx_2][funcs[callee_idx].st_name]), callee_pc);
+        my_log("call [%s@%lx]\n", &(str_table[elf_idx_2][funcs[callee_idx].st_name]), callee_pc);
+        // my_log("call(%s) [%s@%lx]\n", &(str_table[elf_idx_1][funcs[caller_idx].st_name]), &(str_table[elf_idx_2][funcs[callee_idx].st_name]), callee_pc);
     }
 }
 
@@ -305,22 +306,18 @@ __attribute__((used)) void Ret_print(vaddr_t ret_from_pc, vaddr_t ret_to_pc)
     if (ret_to_idx == -1)
     {
         printf("ret_to_pc : %lx\n", ret_to_pc);
-        // panic("Ret_print : ret_to_idx invalid");
-        
-        // log_write("%lx: ", ret_from_pc);
-        // print_space();
-
-        // call_depth--;
         return ;
     }
 
     int elf_idx_1 = funcs[ret_from_idx].idx;
-    int elf_idx_2 = funcs[ret_to_idx].idx;
+    // int elf_idx_2 = funcs[ret_to_idx].idx;
 
     my_log("%lx: ", ret_from_pc);
     print_space();
 
     // if(ret_from_idx == 1 && ret_to_idx == 1)
-    my_log("ret(%s) [%s@%lx]\n", &(str_table[elf_idx_1][funcs[ret_from_idx].st_name]), &(str_table[elf_idx_2][funcs[ret_to_idx].st_name]), ret_to_pc);
+    // my_log("ret(%s) [%s@%lx]\n", &(str_table[elf_idx_1][funcs[ret_from_idx].st_name]), &(str_table[elf_idx_2][funcs[ret_to_idx].st_name]), ret_to_pc);
+    my_log("[%s@%lx] ret\n", &(str_table[elf_idx_1][funcs[ret_from_idx].st_name]), ret_from_pc);
+    // my_log("ret [%s@%lx]\n", &(str_table[elf_idx_2][funcs[ret_to_idx].st_name]), ret_to_pc);
     call_depth--;
 }
