@@ -1,5 +1,6 @@
 #include <proc.h>
 #include <elf.h>
+#include <fs.h>
 
 #ifdef __LP64__
 #define Elf_Ehdr Elf64_Ehdr
@@ -27,7 +28,7 @@ extern size_t ramdisk_read(void *buf, size_t offset, size_t len);
 
 static uint8_t __Mag_num[] = {ELFMAG0, ELFMAG1, ELFMAG2, ELFMAG3};
 
-#define str_table_max 2000
+#define str_table_max 3000
 #define shdr_table_max 15
 typedef struct
 {
@@ -45,6 +46,8 @@ typedef struct
   Elf64_Half e_shstrndx; /* Section header string table index */
   Elf64_Shdr shdr_table[shdr_table_max];
   char str_table[str_table_max];
+
+  int fd;
 } ELF_LoadHelper;
 
 // elf header
@@ -52,7 +55,9 @@ static void Elf_Ehdr_parser(ELF_LoadHelper *load_helper)
 {
   Elf_Ehdr ehdr;
   memset((void *)&ehdr, 0, sizeof(ehdr));
-  ramdisk_read((void *)&ehdr, 0, sizeof(Elf_Ehdr));
+  // ramdisk_read((void *)&ehdr, 0, sizeof(Elf_Ehdr));
+  fs_lseek(load_helper->fd, 0, SEEK_SET);
+  fs_read(load_helper->fd, (void*)&ehdr, sizeof(Elf_Ehdr));
 
   for (int i = 0; i < 4; i++)
   {
@@ -103,13 +108,20 @@ static void Elf_Phdr_parser(ELF_LoadHelper *load_helper)
 
   for (int i = 0; i < load_helper->e_phnum; i++)
   {
-    ramdisk_read((void *)&phdr, load_helper->e_phoff + i * elem_size, elem_size);
+    // ramdisk_read((void *)&phdr, load_helper->e_phoff + i * elem_size, elem_size);
+    fs_lseek(load_helper->fd, load_helper->e_phoff + i * elem_size, SEEK_SET);
+    fs_read(load_helper->fd, (void*)&phdr, sizeof(Elf_Ehdr));
+
     if (phdr.p_type != PT_LOAD)
     {
       continue;
     }
+    // printf("p_vaddr : %lx p_filesz : %lx p_memsz : %lx p_offset : %lx\n", phdr.p_vaddr, phdr.p_filesz, phdr.p_memsz, phdr.p_offset);
     memset((void *)phdr.p_vaddr, 0, phdr.p_memsz);
-    ramdisk_read((void *)phdr.p_vaddr, phdr.p_offset, phdr.p_filesz);
+    fs_lseek(load_helper->fd, phdr.p_offset, SEEK_SET);
+    fs_read(load_helper->fd, (void*)phdr.p_vaddr, phdr.p_filesz);
+    // ramdisk_read((void*)phdr.p_vaddr, );
+    // ramdisk_read((void *)phdr.p_vaddr, phdr.p_offset, phdr.p_filesz);
     // printf("type : %lx, flags : %ld, offset : %lx, vaddr : %lx, paddr : %lx, filesz : %ld, memsz : %ld, align : %lx\n",
     // phdr.p_type, phdr.p_flags, phdr.p_offset, phdr.p_vaddr, phdr.p_paddr, phdr.p_filesz, phdr.p_memsz, phdr.p_align);
   }
@@ -127,7 +139,10 @@ static void Elf_Shdr_parser(ELF_LoadHelper *load_helper)
   int first = 1;
   for (int i = 0; i < load_helper->e_shnum; i++)
   {
-    ramdisk_read((void *)&shdr, load_helper->e_shoff + i * elem_size, elem_size);
+    // ramdisk_read((void *)&shdr, load_helper->e_shoff + i * elem_size, elem_size);
+    fs_lseek(load_helper->fd, load_helper->e_shoff + i * elem_size, SEEK_SET);
+    fs_read(load_helper->fd, (void*)&shdr, elem_size);
+
     load_helper->shdr_table[i] = shdr;
     if (shdr.sh_type == SHT_SYMTAB)
     {
@@ -147,7 +162,9 @@ static void Elf_Str_parse(ELF_LoadHelper *loader_helper)
 {
   Elf64_Shdr shdr_str = loader_helper->shdr_table[loader_helper->e_strndx];
   assert(shdr_str.sh_size <= str_table_max);
-  ramdisk_read((void *)&(loader_helper->str_table), shdr_str.sh_offset, shdr_str.sh_size);
+  // ramdisk_read((void *)&(loader_helper->str_table), shdr_str.sh_offset, shdr_str.sh_size);
+  fs_lseek(loader_helper->fd, shdr_str.sh_offset, SEEK_SET);
+  fs_read(loader_helper->fd, (void*)&(loader_helper->str_table), shdr_str.sh_size);
 }
 
 // symbol table
@@ -161,7 +178,10 @@ static void Elf_Sym_parser(ELF_LoadHelper *load_helper)
 
   for (int i = 0; i < load_helper->e_symnum; i++)
   {
-    ramdisk_read((void *)&sym, shdr_sym.sh_offset + i * elem_size, elem_size);
+    // ramdisk_read((void *)&sym, shdr_sym.sh_offset + i * elem_size, elem_size);
+    fs_lseek(load_helper->fd, shdr_sym.sh_offset + i * elem_size, SEEK_SET);
+    fs_read(load_helper->fd, (void*)&sym, elem_size);
+
     if (Elf_ST_TYPE((sym.st_info)) == STT_NOTYPE)
     {
       char *name = &(load_helper->str_table[sym.st_name]);
@@ -176,10 +196,15 @@ static void Elf_Sym_parser(ELF_LoadHelper *load_helper)
 
 static ELF_LoadHelper elf_load_helper;
 
+
 // load program
 static uintptr_t loader(PCB *pcb, const char *filename)
 {
-  printf("%d\n", sizeof(ELF_LoadHelper));
+  assert(filename);
+  int fd = fs_open(filename, 0, 0);
+  elf_load_helper.fd = fd;
+
+  printf("ELF_LoadHelper sizeof :  %d\n", sizeof(ELF_LoadHelper));
   Elf_Ehdr_parser(&elf_load_helper);
   Elf_Phdr_parser(&elf_load_helper);
   Elf_Shdr_parser(&elf_load_helper);

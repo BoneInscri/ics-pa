@@ -1324,6 +1324,200 @@ Nanos-lite 的 ELF 文件在 NEMU中读取，但是 用户程序的ELF呢？？
 
 
 
+100. **ftrace需要哦修改一下**
+
+只需要关注一个函数的调用还有返回
+
+所以
+
+- call 就是 某个地址 调用了某个函数
+- ret 就是 某个地址 返回了某个函数
+
+
+
+
+
+101. **文件系统的设计**
+
+要实现一个完整的批处理系统，我们还需要向系统提供多个程序。
+
+操作系统还需要在存储介质的驱动程序之上为用户程序提供一种更高级的抽象，那就是文件。
+
+
+
+
+
+102. **文件？**
+
+文件的本质就是字节序列，另外还由一些额外的属性构成。
+
+这样，那些**额外的属性就维护了文件到ramdisk存储位置的映射**。
+
+
+
+103. **实现的简易文件系统功能？**
+
+sfs(Simple File System)
+
+- 
+  每个文件的大小是固定的
+- 写文件时不允许超过原有文件的大小
+- 文件的数量是固定的，不能创建新文件
+- 没有目录
+
+
+
+从ramdisk的最开始一个挨着一个地存放：
+
+```c
+0
++-------------+---------+----------+-----------+--
+|    file0    |  file1  |  ......  |   filen   |
++-------------+---------+----------+-----------+--
+ \           / \       /            \         /
+  +  size0  +   +size1+              + sizen +
+```
+
+
+
+104. **记录文件的名字和大小？**
+
+使用文件记录表
+
+```c
+typedef struct {
+    char *name;         // 文件名
+    size_t size;        // 文件大小
+    size_t disk_offset;  // 文件在ramdisk中的偏移
+} Finfo;
+```
+
+开启 HAS_NAVY = 1
+
+```shell
+make ARCH=riscv64-nemu update
+```
+
+
+
+105. **如果你修改了Navy中的内容，记得通过update更新镜像文件**
+
+
+
+
+
+106. **sfs 的特别之处**
+
+直接使用绝对路径作为文件名。
+
+由于sfs没有目录，我们把目录分隔符`/`也认为是文件名的一部分，**例如`/bin/hello`是一个完整的文件名**。
+
+这种做法其实也隐含了目录的层次结构，对于文件数量不多的情况，这种做法既简单又奏效
+
+
+
+107. **文件读写接口**
+
+```c
+size_t read(const char *filename, void *buf, size_t len);
+size_t write(const char *filename, const void *buf, size_t len);
+```
+
+上面的接口有缺陷：无法用文件名标识标准输入和输出，所以接口需要修改为：
+
+```c
+int open(const char *pathname, int flags, int mode);
+size_t read(int fd, void *buf, size_t len);
+size_t write(int fd, const void *buf, size_t len);
+int close(int fd);
+```
+
+通过一个编号来表示文件，这个编号就是文件描述符(file descriptor)。
+
+一个文件描述符对应一个正在打开的文件，由操作系统来维护文件描述符到具体文件的映射。
+
+于是我们很自然地通过`open()`系统调用来打开一个文件，并返回相应的文件描述符。
+
+
+
+108. **引入文件的读写字节偏移量**
+
+不希望每次读写操作都需要从头开始，于是我们需要为每一个已经打开的文件引入偏移量属性`open_offset`，来记录目前文件操作的位置。
+
+每次对文件读写了多少个字节，偏移量就前进多少。
+
+为了简化实现，我们还是把偏移量放在文件记录表中进行维护。
+
+
+
+
+
+109. **使用lseek调整offset字节偏移量**
+
+````c
+size_t lseek(int fd, size_t offset, int whence);
+````
+
+
+
+110. **三个特殊的文件描述符**
+
+```c
+#define FD_STDIN 0
+#define FD_STDOUT 1
+#define FD_STDERR 2
+```
+
+标准输入`stdin`，标准输出`stdout`和标准错误`stderr`
+
+- printf 调用 write(FD_STDOUT, buf, len)
+- scanf 调用 read(FD_STDIN, buf, len)
+
+
+
+111. **文件的通用接口**
+
+```c
+int fs_open(const char *pathname, int flags, int mode);
+size_t fs_read(int fd, void *buf, size_t len);
+size_t fs_write(int fd, const void *buf, size_t len);
+size_t fs_lseek(int fd, size_t offset, int whence);
+int fs_close(int fd);
+```
+
+- 因此"`fs_open()`**没有找到`pathname`所指示的文件"属于异常情况**，需要使用assertion**终止程序运行**。
+- 允许所有用户程序都可以对所有已存在的文件进行读写，在实现`fs_open()`的时候**就可以忽略`flags`和`mode`了**。
+- 使用`ramdisk_read()`和`ramdisk_write()`**来进行文件的真正读写**。
+- 由于文件的大小固定，在实现`fs_read()`， `fs_write()`和`fs_lseek()`的时候，**注意偏移量不要越过文件的边界**。
+- 除了写入`stdout`和`stderr`之外(用`putch()`输出到串口)，其余对于`stdin`，`stdout`和`stderr`这三个特殊文件的操作**可以直接忽略。**
+- sfs没有维护文件打开的状态，`fs_close()`可以直接返回`0`，**表示总是关闭成功**。
+
+
+
+112. **查manual**
+
+```shell
+man 2 open
+man 2 read
+man 2 write
+man 2 lseek
+man 2 close
+```
+
+其中`2`表示查阅和系统调用相关的manual page、
+
+
+
+113. **通过 navy-apps/tests/file-test**
+
+添加到`navy-apps/Makefile`的`TESTS`变量中
+
+
+
+
+
+114. **为了让strace可读性高，可以将fd翻译成 字符串，即每次输出的不是fd，而是fd对应的文件名**
+
 
 
 

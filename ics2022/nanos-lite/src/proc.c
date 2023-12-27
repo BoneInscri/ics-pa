@@ -25,7 +25,9 @@ void init_proc() {
   Log("Initializing processes...");
 
   // load program here
-  naive_uload(NULL, NULL);
+  naive_uload(NULL, "/bin/file-test");
+  // naive_uload(NULL, "/bin/hello");
+  // naive_uload(NULL, "/bin/dummy");
 }
 
 Context* schedule(Context *prev) {
