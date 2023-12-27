@@ -24,6 +24,7 @@ static const char *sysnum_2_sysname[] = {
     [SYS_wait] = "wait",
     [SYS_times] = "times",
     [SYS_gettimeofday] = "gettimeofday"};
+
 static const char *flags_2_str[] = {
     [SEEK_CUR] = "seek_cur",
     [SEEK_END] = "seek_end",
@@ -34,6 +35,12 @@ static const char *flags_2_str[] = {
 #define STDIN 0
 #define STDOUT 1
 #define STDERROR 2
+
+typedef struct
+{
+  uint64_t sec;
+  uint64_t usec;
+} timeval;
 
 static void do_yield(Context *c)
 {
@@ -103,6 +110,20 @@ static void do_close(Context *c)
   c->RETVAL = fs_close(fd);
 }
 
+static void do_gettimeofday(Context *c)
+{
+  timeval *tv = (timeval *)c->ARG1;
+  // timezione *tz = (struct timezione *)c->ARG2;
+  // assert(tz == NULL);
+  AM_TIMER_UPTIME_T uptime;
+  uptime = io_read(AM_TIMER_UPTIME);
+
+  tv->sec = uptime.us / 1000000;
+  tv->usec = uptime.us % 1000000;
+
+  c->RETVAL = 0;
+}
+
 static void (*syscall_funcs[])(Context *) = {
     [SYS_exit] = do_exit,
     [SYS_yield] = do_yield,
@@ -111,8 +132,8 @@ static void (*syscall_funcs[])(Context *) = {
     [SYS_open] = do_open,
     [SYS_lseek] = do_lseek,
     [SYS_read] = do_read,
-    [SYS_close] = do_close
-};
+    [SYS_close] = do_close,
+    [SYS_gettimeofday] = do_gettimeofday};
 
 #define ARRLEN(arr) (int)(sizeof(arr) / sizeof(arr[0]))
 #define N_SYSCALL ARRLEN(syscall_funcs)

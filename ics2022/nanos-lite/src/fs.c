@@ -86,11 +86,13 @@ size_t fs_write(int fd, const void *buf, size_t len)
   size_t offset_disk = file_table[fd].disk_offset;
   size_t open_offset = file_table[fd].open_offset;
   size_t size = file_table[fd].size;
-  if (open_offset > size)
-  {
-    panic("fd_write : over size");
+  
+  if(fd != FD_STDIN && fd != FD_STDOUT && fd != FD_STDERR) {
+    if (open_offset > size)
+    {
+      panic("fd_write : over size");
+    }
   }
-
   file_table[fd].write(buf, offset_disk + open_offset, len);
   file_table[fd].open_offset += len;
  
