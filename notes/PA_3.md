@@ -1689,6 +1689,19 @@ https://www.cs.rit.edu/~ats/books/ooc.pdf
 
 ==需要注意，printf的最后一定要通过\n 换行强制输出==
 
+实现 NDL 的和时钟相关的API
+
+```c
+// 以毫秒为单位返回系统时间
+uint32_t NDL_GetTicks();
+```
+
+
+
+
+
+
+
 
 
 （3）键盘

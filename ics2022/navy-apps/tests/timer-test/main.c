@@ -1,15 +1,15 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <sys/time.h>
+#include <NDL.h>
 
 int main()
 {
-    struct timeval time;
-
     uint64_t cnt = 1;
+    uint32_t us = 0;
+    NDL_Init(0);
     while(1) {
-        int ret = gettimeofday(&time, NULL);        
-        uint64_t us = time.tv_sec * 1000000 + time.tv_usec;
+        us = NDL_GetTicks();
         // printf("us : %lx\n", us);
         if(us > cnt * 1000000 / 2) {
         // if(us > cnt * 1000000) {
@@ -17,5 +17,6 @@ int main()
             cnt++;
         }
     }
+    NDL_Quit();
     return 0;
 }
