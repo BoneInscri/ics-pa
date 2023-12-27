@@ -131,6 +131,7 @@ char *strncpy(char *dst, const char *src, size_t n)
       i++;
     }
   }
+  dst[src_len] = '\0';
   // 使用\0进行补全
   return dst;
 }
