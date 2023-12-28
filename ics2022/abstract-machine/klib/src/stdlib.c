@@ -33,6 +33,7 @@ static int init_flag = 0;
 static char *klib_hbrk;
 
 void *malloc(size_t size) {
+  // panic("pause");
   // On native, malloc() will be called during initializaion of C runtime.
   // Therefore do not call panic() here, else it will yield a dead recursion:
   //   panic() -> putchar() -> (glibc) -> malloc() -> panic()

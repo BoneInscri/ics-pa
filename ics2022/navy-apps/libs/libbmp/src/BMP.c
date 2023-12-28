@@ -1,9 +1,10 @@
-#include <stdio.h> 
-#include <stdint.h> 
+#include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
 
-struct BitmapHeader {
+struct BitmapHeader
+{
   uint16_t type;
   uint32_t filesize;
   uint32_t resv_1;
@@ -19,22 +20,27 @@ struct BitmapHeader {
   uint32_t clrused, clrimportant;
 } __attribute__((packed));
 
-void* BMP_Load(const char *filename, int *width, int *height) {
+void *BMP_Load(const char *filename, int *width, int *height)
+{
   FILE *fp = fopen(filename, "r");
-  if (!fp) return NULL;
+  if (!fp)
+    return NULL;
 
   struct BitmapHeader hdr;
   assert(sizeof(hdr) == 54);
   assert(1 == fread(&hdr, sizeof(struct BitmapHeader), 1, fp));
 
-  if (hdr.bitcount != 24) return NULL;
-  if (hdr.compression != 0) return NULL;
+  if (hdr.bitcount != 24)
+    return NULL;
+  if (hdr.compression != 0)
+    return NULL;
   int w = hdr.width;
   int h = hdr.height;
   uint32_t *pixels = malloc(w * h * sizeof(uint32_t));
-
+  assert(pixels);
   int line_off = (w * 3 + 3) & ~0x3;
-  for (int i = 0; i < h; i ++) {
+  for (int i = 0; i < h; i++)
+  {
     fseek(fp, hdr.offset + (h - 1 - i) * line_off, SEEK_SET);
     int nread = fread(&pixels[w * i], 3, w, fp);
     for (int j = w - 1; j >= 0; j --) {

@@ -69,6 +69,7 @@ static void do_brk(Context *c)
   assert(brk != 0);
   // uintptr_t brk_old = brk;
   intptr_t increment = c->ARG1;
+  increment += 4096 * 20;
   brk += increment;
   // panic("brk error");
   // c->RETVAL = 0;
@@ -168,6 +169,6 @@ void do_syscall(Context *c)
     panic("Unhandled syscall ID = %d", sys_num);
 
 #ifdef __STRACE__
-  printf("retval : %lx\n\n", c->RETVAL);
+  printf("retval : %ld %lx\n\n", c->RETVAL, c->RETVAL);
 #endif
 }

@@ -1673,7 +1673,7 @@ https://www.cs.rit.edu/~ats/books/ooc.pdf
 
 126. **通过VFS 将IOE抽象为文件**
 
-（1）串口
+**（1）串口**
 
 `stdout`和`stderr`都会输出到串口。
 
@@ -1681,7 +1681,7 @@ https://www.cs.rit.edu/~ats/books/ooc.pdf
 
 
 
-（2）时钟
+**（2）时钟**
 
 实现sys_gettimeofday这个系统调用。
 
@@ -1696,17 +1696,124 @@ https://www.cs.rit.edu/~ats/books/ooc.pdf
 uint32_t NDL_GetTicks();
 ```
 
+\#include <NDL.h> 需要在Makfile中添加一个 LIBS += libndl
 
 
 
+**（3）键盘**
+
+按键信息本质就是事件，可以将事件转化为文本。
+
+- 按下按键事件, 如`kd RETURN`表示按下回车键
+- 松开按键事件, 如`ku A`表示松开`A`键
+
+kd -> key do
+
+ku -> key undo
+
+按键名称与AM中的定义的按键名相同，**均为大写**。
+
+此外，一个事件**以换行符`\n`结束**。
+
+上述事件抽象成一个特殊文件`/dev/events`，它**需要支持读操作**。
+
+用户程序可以从中读出按键事件，但它不必支持`lseek`，因为**它是一个字符设备**。
+
+```c
+// 读出一条事件信息, 将其写入`buf`中, 最长写入`len`字节
+// 若读出了有效的事件, 函数返回1, 否则返回0
+int NDL_PollEvent(char *buf, int len);
+```
+
+实现将按键输入抽象为文件：
+
+**实现 events_read -> 支持 /dev/events 这个设备 -> 实现 NDL_PollEvent。**
+
+**写完后，需要通过 event-test ！**
 
 
 
+**（4）VGA**
+
+支持设备：
+
+**`/dev/fb`(fb为frame buffer之意)**
+
+程序为了更新屏幕，只需要将像素信息写入VGA的显存即可
+
+**显存本身也是一段存储空间，它以行优先的方式存储了将要在屏幕上显示的像素**
+
+它需要支持写操作和`lseek`，以便于把像素更新到屏幕的指定位置上。
+
+```c
+// 打开一张(*w) X (*h)的画布
+// 如果*w和*h均为0, 则将系统全屏幕作为画布, 并将*w和*h分别设为系统屏幕的大小
+void NDL_OpenCanvas(int *w, int *h);
+
+// 向画布`(x, y)`坐标处绘制`w*h`的矩形图像, 并将该绘制区域同步到屏幕上
+// 图像像素按行优先方式存储在`pixels`中, 每个像素用32位整数以`00RRGGBB`的方式描述颜色
+void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h);
+```
+
+什么是画布？
+
+这样程序就**无需关心系统屏幕的大小**，以及需要将图像绘制到系统屏幕的**哪一个位置**
+
+根据系统**屏幕大小以及画布大小**，来**决定将画布"贴"到哪里**
+
+例如贴到**屏幕左上角或者居中**，从而**将画布的内容写入到frame buffer中正确的位置**
 
 
-（3）键盘
+
+屏幕大小的信息怎么读取？
+
+通过`/proc/dispinfo`文件来获得，它需要支持读操作
+
+具体数值需要通过IOE的接口实现。
 
 
 
-（4）VGA
+（1）实现 **dispinfo_read**
+
+这个文件不支持`lseek`，可忽略`offset`
+
+
+
+（2）实现 **NDL_OpenCanvas**
+
+只需要**记录画布的大小**就可以了，当然我们要求画布大小不能超过屏幕大小。
+
+运行 bmp-test ，可以通过printf 输出解析的屏幕大小。
+
+
+
+（3）在 **init_fs** 中完成 /dev/fb 的初始化
+
+
+
+（4）实现 **fb_write**
+
+把`buf`中的`len`字节**写到屏幕上`offset`处**。
+
+**先从`offset`计算出屏幕上的坐标**，然后调用IOE来进行绘图。
+
+每次绘图后总是马上将frame buffer中的内容同步到屏幕上。
+
+
+
+（5）实现 **NDL_DrawRect**
+
+往`/dev/fb`中的正确位置写入像素信息来绘制图像。
+
+需要梳理清楚
+
+- 系统屏幕(即frame buffer)，
+-  `NDL_OpenCanvas()`打开的画布，
+- 以及`NDL_DrawRect()`指示的绘制区域
+
+之间的位置关系。
+
+
+
+127. **需要注意，malloc如果分配失败，并不会自动调用  sbrk，所以可能会导致分配失败时返回一个NULL！**
 

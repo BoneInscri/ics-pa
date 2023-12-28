@@ -28,7 +28,7 @@ extern size_t ramdisk_read(void *buf, size_t offset, size_t len);
 
 static uint8_t __Mag_num[] = {ELFMAG0, ELFMAG1, ELFMAG2, ELFMAG3};
 
-#define str_table_max 3000
+#define str_table_max 4000
 #define shdr_table_max 15
 typedef struct
 {

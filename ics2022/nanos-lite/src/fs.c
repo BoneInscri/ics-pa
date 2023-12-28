@@ -22,8 +22,9 @@ enum
   FD_STDIN,
   FD_STDOUT,
   FD_STDERR,
+  FD_DISPINFO,
+  FD_FB,
   FD_EVENTS,
-  FD_FB
 };
 
 size_t invalid_read(void *buf, size_t offset, size_t len)
@@ -44,6 +45,8 @@ static Finfo file_table[] __attribute__((used)) = {
     [FD_STDOUT] = {"stdout", 0, 0, invalid_read, serial_write},
     [FD_STDERR] = {"stderr", 0, 0, invalid_read, serial_write},
     [FD_EVENTS] = {"/dev/events", 0, 0, events_read, invalid_write},
+    [FD_DISPINFO] = {"/proc/dispinfo", 0, 0, dispinfo_read, invalid_write},
+    [FD_FB] = {"/dev/fb", 0, 0, invalid_read, fb_write},
 #include "files.h"
 };
 
@@ -52,7 +55,10 @@ static Finfo file_table[] __attribute__((used)) = {
 
 void init_fs()
 {
-  // TODO: initialize the size of /dev/fb
+  AM_GPU_CONFIG_T cfg = io_read(AM_GPU_CONFIG);
+  int width = cfg.width;
+  int height = cfg.height;
+  file_table[FD_FB].size = width * height;
 }
 
 int fs_open(const char *pathname, int flags, int mode)
@@ -73,7 +79,8 @@ size_t fs_read(int fd, void *buf, size_t len)
   size_t offset_disk = file_table[fd].disk_offset;
   size_t open_offset = file_table[fd].open_offset;
   size_t size = file_table[fd].size;
-  if(fd != FD_EVENTS) {
+  if (fd != FD_EVENTS && fd != FD_FB && fd!=FD_DISPINFO)
+  {
     if (open_offset > size)
     {
       panic("fd_read : over size");

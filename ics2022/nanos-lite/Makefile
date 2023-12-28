@@ -11,7 +11,7 @@ CFLAGS += -D__STRACE__
 endif
 
 include $(AM_HOME)/Makefile
-$(info $(CFLAGS))
+# $(info $(CFLAGS))
 
 ifeq ($(ARCH),native)
 ISA = am_native

@@ -43,12 +43,26 @@ size_t events_read(void *buf, size_t offset, size_t len)
 
 size_t dispinfo_read(void *buf, size_t offset, size_t len)
 {
-  return 0;
+  AM_GPU_CONFIG_T cfg = io_read(AM_GPU_CONFIG);
+  int width = cfg.width;
+  int height = cfg.height;
+  return sprintf((char*)buf, "w : %d, h : %d", width, height);
 }
 
 size_t fb_write(const void *buf, size_t offset, size_t len)
 {
-  return 0;
+  AM_GPU_CONFIG_T cfg = io_read(AM_GPU_CONFIG);
+  int width = cfg.width;
+  // int height = cfg.height;
+
+  int x = offset % width;
+  int y = offset / width;
+
+  // printf("y : %d, x : %d, len : %d, width : %d\n", y, x, len, width);
+  assert(x + len < width);
+  io_write(AM_GPU_FBDRAW, x, y, (uint32_t*)buf, len, 1, true);
+
+  return len;
 }
 
 void init_device()
